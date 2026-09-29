@@ -170,7 +170,7 @@ a 404 template when the numeric event ID does not exist.
 - The dashboard is intended for trusted local use; HTTPS and production
   identity management are not configured.
 
-## 9. XShield 2.0 Integration Boundary
+## 9. XShield Integration Boundary
 
 Phase 1 introduces a validated internal event contract without changing the
 current browser pipeline. Phase 2 adds the database foundation:
@@ -277,3 +277,42 @@ action failure, the route returns a generic `500` analysis error and does not
 write a misleading safe event. Database failures return a separate generic
 storage error. Existing browser persistence and historical events remain
 compatible.
+
+## 10. Behavioral and Context Signals
+
+Phase 6 adds `app.services.behavior` as a separate, deterministic context
+layer. It operates on bounded recent `security_events` history for one
+application and does not replace or modify the rule, ML, hybrid, risk, or
+action results.
+
+The service reports repeated suspicious activity, repeated targeting of a
+normalized endpoint, short-window event bursts, detection-pattern diversity,
+recent event counts, bounded window settings, and explanations. The
+thresholds are project-defined prototype heuristics rather than universal
+security standards. Application identity comes from event association; IP
+addresses and request metadata remain observed or supplied context and are not
+treated as proof of human attacker identity.
+
+Persisted history is loaded with one bounded parameterized query. Raw payloads
+are not the primary behavioral signal, and no additional event table is
+required.
+
+## 11. Incident Correlation
+
+Phase 7 adds `app.services.incidents` as a separate deterministic service.
+It derives explainable incidents from one current event and a bounded,
+application-scoped recent history. It does not change detector, risk, action,
+or Phase 6 behavior.
+
+Two events are related when they are in the configured time window and share
+at least one strong relationship: the same request ID, the same normalized
+endpoint, or an overlapping matched-rule pattern. Matching event type is
+recorded as supporting context only; it is not sufficient by itself.
+
+High- or Critical-risk current events may form explicit single-event
+incidents. Otherwise, an incident requires at least one related recent event.
+The representation includes a stable hash-based incident ID, application,
+event IDs, start/latest timestamps, risk levels, actions, event types,
+normalized endpoints, matched patterns, Phase 6 context, and correlation
+reasons. Correlation windows, history bounds, and endpoint matching are
+project-defined heuristics rather than security standards.

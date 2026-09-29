@@ -169,7 +169,7 @@ tamper/audit requirements.
 This document is defensive documentation for the local application; it does
 not provide instructions for attacking external systems.
 
-## XShield 2.0 Event Contract Security
+## XShield Event Contract Security
 
 The Phase 1 contract bounds event fields, request IDs, endpoints, metadata
 items, and metadata values before a future integration API can process them.
@@ -184,3 +184,36 @@ The contract supports bounded retention modes, including `truncated` and
 `hash_only`. Phase 1 defines these values but does not yet change the existing
 SQLite logger or add the API that will apply them. No supplied IP or browser
 value should be treated as proof of real-world attacker identity.
+
+## Behavioral and Context Security
+
+Phase 6 adds bounded, explainable behavioral context signals in
+`app.services.behavior`. The service summarizes recent events associated with
+one application and can identify repeated suspicious activity, repeated
+normalized endpoint targeting, short-window event bursts, and multiple
+matched detection patterns.
+
+These are deterministic, project-defined heuristics rather than security
+standards or universal scores. Configured history and burst windows and a
+maximum event count limit processing. Raw payload text is not the primary
+behavioral signal. Application association identifies the registered
+application, not a human attacker; IP addresses and other request metadata
+remain context with their declared trust level.
+
+## Incident Correlation Security
+
+Phase 7 correlation is implemented in `app.services.incidents` and uses
+application-scoped, bounded event history. It never combines events from
+different applications and does not use raw payload content as its primary
+correlation key.
+
+The service requires a close time window plus a strong explainable
+relationship: shared request ID, equal normalized endpoint, or overlapping
+matched detection pattern. Event type is supporting context only. High- and
+Critical-risk current events can be represented as explicit single-event
+incidents; this is a project rule, not proof of an attack.
+
+Incident IDs are deterministic hashes of the application and event keys.
+Correlation does not identify attackers. API keys, request IDs, IP addresses,
+and metadata identify application or observed context only and are not proof
+of human identity. No firewall or network-blocking action is performed.

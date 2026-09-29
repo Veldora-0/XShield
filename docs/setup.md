@@ -125,7 +125,7 @@ not a substitute for HTTPS or production identity management.
 The suite covers rule, ML, hybrid, risk, action, database, dashboard,
 pipeline, evaluation, and Phase 14 hardening behavior.
 
-## XShield 2.0 Phase 1 and Phase 2
+## XShield Phase 1 and Phase 2
 
 Phase 1 adds the internal event contract and shared configuration limits:
 
@@ -148,7 +148,7 @@ the reusable `app.services.api_keys.authenticate_api_key` service for Phase 4.
 The existing application remains runnable with the normal startup command, and
 all migration behavior is covered by the complete test suite.
 
-### XShield 2.0 Phase 4 event ingestion
+### XShield Phase 4 event ingestion
 
 Phase 4 adds `POST /api/v1/events`. Create an application and key with the
 Phase 3 commands, set the key locally, then send a bounded JSON request:
@@ -181,3 +181,29 @@ and `413` for oversized requests.
 
 Phase 4 does not implement behavioral analysis, incidents, dashboard changes,
 rate limiting, or external integrations.
+
+### XShield Phase 6 behavioral context
+
+Phase 6 provides bounded context analysis through
+`app.services.behavior.analyze_behavior_context`. It summarizes recent
+application-associated events for repeated suspicious activity, normalized
+endpoint repetition, short-window bursts, and detection-pattern diversity.
+The settings in `app/config.py` are conservative project-defined heuristics,
+not industry standards. The service does not change existing detector or risk
+results, does not use raw payloads as its primary signal, and does not infer
+human attacker identity from application keys, IP addresses, or request
+metadata.
+
+### XShield Phase 7 incident correlation
+
+Phase 7 provides reusable incident derivation through
+`app.services.incidents`. Events are grouped only within the configured
+application-scoped correlation window and bounded recent-event limit. Strong
+relationships are shared request IDs, normalized endpoints, or overlapping
+matched-rule patterns; event type alone is not enough.
+
+High- and Critical-risk current events may produce an explicit single-event
+incident. The result includes a deterministic incident ID and explains the
+events, timestamps, risk levels, actions, endpoints, patterns, and Phase 6
+context involved. These are project-defined monitoring heuristics, not
+security standards, and they do not identify human attackers.

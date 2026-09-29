@@ -465,6 +465,30 @@ def get_recent_events(
     return [_deserialize_event(row) for row in rows]
 
 
+def get_recent_application_events(
+    application_id: int,
+    since_timestamp: str,
+    *,
+    limit: int = 100,
+    database_path: str | Path = DEFAULT_DATABASE_PATH,
+) -> list[dict]:
+    """Fetch a bounded recent event history for one application."""
+    if limit < 1:
+        raise ValueError("limit must be at least 1.")
+    with _connect(database_path) as connection:
+        rows = connection.execute(
+            """
+            SELECT *
+            FROM security_events
+            WHERE application_id = ? AND timestamp >= ?
+            ORDER BY timestamp DESC, id DESC
+            LIMIT ?
+            """,
+            (int(application_id), str(since_timestamp), int(limit)),
+        ).fetchall()
+    return [_deserialize_event(row) for row in rows]
+
+
 def get_event_by_id(
     event_id: int,
     database_path: str | Path = DEFAULT_DATABASE_PATH,

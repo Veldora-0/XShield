@@ -16,7 +16,7 @@ guarantee detection of every XSS attack and does not replace context-aware
 output encoding, trusted sanitization, secure application design, or a
 production web-application firewall.
 
-### XShield 2.0 preparation status
+### XShield preparation status
 
 The project is being evolved incrementally toward an integration-ready
 platform. Phase 1 defines a validated internal security-event contract and
@@ -495,7 +495,7 @@ More detailed documentation is available in:
 - `docs/security.md`
 - `docs/parameters.md`
 
-## XShield 2.0 Event Contract and Database Foundation
+## XShield Event Contract and Database Foundation
 
 The Phase 1 internal contract is implemented in
 `app/services/event_contract.py`. It is intended to become the shared
@@ -583,7 +583,7 @@ credentials return `403`; malformed JSON returns `400`; invalid event fields
 return `422`; wrong content type returns `415`; and oversized requests return
 `413`. Rate limiting is not implemented in this local phase.
 
-### XShield 2.0 Phase 5 shared analysis
+### XShield Phase 5 shared analysis
 
 Browser submissions and authenticated API events now use the same
 `app.services.analysis.analyze_security_input` orchestration. It calls the
