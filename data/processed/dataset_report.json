@@ -1,0 +1,50 @@
+{
+  "source_file": "data\\raw\\httpparamsdataset\\payload_full.csv",
+  "source_rows": 31067,
+  "source_missing_records": 0,
+  "source_duplicate_rows": 0,
+  "source_label_counts": {
+    "norm": 19304,
+    "anom": 11763
+  },
+  "source_attack_type_counts": {
+    "norm": 19304,
+    "sqli": 10852,
+    "xss": 532,
+    "path-traversal": 290,
+    "cmdi": 89
+  },
+  "unsupported_attack_records_excluded": 11231,
+  "invalid_records_excluded": 0,
+  "exact_duplicates_removed": 0,
+  "canonical_duplicates_removed": 0,
+  "length_metadata_mismatches": 15,
+  "final_rows": 19836,
+  "final_class_counts": {
+    "0": 19304,
+    "1": 532
+  },
+  "random_seed": 42,
+  "test_size": 0.2,
+  "train_rows": 15869,
+  "test_rows": 3967,
+  "train_class_counts": {
+    "0": 15443,
+    "1": 426
+  },
+  "test_class_counts": {
+    "0": 3861,
+    "1": 106
+  },
+  "canonical_train_test_overlap": 0,
+  "label_mapping": {
+    "0": "BENIGN (source attack_type=norm)",
+    "1": "XSS (source attack_type=xss)"
+  },
+  "excluded_attack_types": [
+    "sqli",
+    "cmdi",
+    "path-traversal"
+  ],
+  "leakage_check": "Compared case-folded, whitespace-normalized text keys across splits; no exact normalized overlap was found."
+}

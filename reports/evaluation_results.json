@@ -1,0 +1,244 @@
+{
+  "dataset": {
+    "source": "HttpParamsDataset",
+    "source_reference": "Kaggle/Original HttpParamsDataset repository",
+    "test_file": "data/processed/xss_test.csv",
+    "samples": 3967,
+    "class_counts": {
+      "0": 3861,
+      "1": 106
+    },
+    "label_mapping": {
+      "0": "BENIGN",
+      "1": "XSS"
+    },
+    "same_test_set_for_all_methods": true
+  },
+  "thresholds": {
+    "rule_score": 1,
+    "ml_probability": 0.5,
+    "hybrid_signal": 0.5,
+    "experimental": true,
+    "note": "Thresholds were documented evaluation parameters and were not optimized on this test set."
+  },
+  "methods": {
+    "rule_based": {
+      "metrics": {
+        "accuracy": 0.9979833627426267,
+        "precision_xss": 1.0,
+        "recall_xss": 0.9245283018867925,
+        "f1_xss": 0.9607843137254902,
+        "confusion_matrix": {
+          "labels": [
+            0,
+            1
+          ],
+          "rows_actual_columns_predicted": [
+            [
+              3861,
+              0
+            ],
+            [
+              8,
+              98
+            ]
+          ],
+          "true_negative": 3861,
+          "false_positive": 0,
+          "false_negative": 8,
+          "true_positive": 98
+        },
+        "threshold": 1,
+        "threshold_meaning": "Any positive rule score is classified as suspicious."
+      },
+      "errors": {
+        "false_positives": [],
+        "false_negatives": [
+          {
+            "text": "prompt(1);>",
+            "actual_label": 1,
+            "predicted_label": 0,
+            "signal": 0.0
+          },
+          {
+            "text": "scriptalert(crosssitescripting)/script",
+            "actual_label": 1,
+            "predicted_label": 0,
+            "signal": 0.0
+          },
+          {
+            "text": "<?xml:namespace prefix=\"t\" ns=\"urn:schemas-microsoft-com:time\">",
+            "actual_label": 1,
+            "predicted_label": 0,
+            "signal": 0.0
+          },
+          {
+            "text": "write(1) autofocus>",
+            "actual_label": 1,
+            "predicted_label": 0,
+            "signal": 0.0
+          },
+          {
+            "text": "x:expression8write(1)9>",
+            "actual_label": 1,
+            "predicted_label": 0,
+            "signal": 0.0
+          }
+        ]
+      }
+    },
+    "ml": {
+      "metrics": {
+        "accuracy": 0.9989916813713133,
+        "precision_xss": 1.0,
+        "recall_xss": 0.9622641509433962,
+        "f1_xss": 0.9807692307692307,
+        "confusion_matrix": {
+          "labels": [
+            0,
+            1
+          ],
+          "rows_actual_columns_predicted": [
+            [
+              3861,
+              0
+            ],
+            [
+              4,
+              102
+            ]
+          ],
+          "true_negative": 3861,
+          "false_positive": 0,
+          "false_negative": 4,
+          "true_positive": 102
+        },
+        "threshold": 0.5,
+        "threshold_meaning": "Probability at or above 0.5 is classified as XSS.",
+        "tfidf_features": 54919
+      },
+      "errors": {
+        "false_positives": [],
+        "false_negatives": [
+          {
+            "text": "prompt(1);>",
+            "actual_label": 1,
+            "predicted_label": 0,
+            "signal": 0.4914574449913686
+          },
+          {
+            "text": "<?xml:namespace prefix=\"t\" ns=\"urn:schemas-microsoft-com:time\">",
+            "actual_label": 1,
+            "predicted_label": 0,
+            "signal": 0.06771976008014946
+          },
+          {
+            "text": "x:expression8write(1)9>",
+            "actual_label": 1,
+            "predicted_label": 0,
+            "signal": 0.2689415697119696
+          },
+          {
+            "text": "a=\"get\";",
+            "actual_label": 1,
+            "predicted_label": 0,
+            "signal": 0.04458214457986242
+          }
+        ]
+      }
+    },
+    "hybrid": {
+      "metrics": {
+        "accuracy": 0.9979833627426267,
+        "precision_xss": 1.0,
+        "recall_xss": 0.9245283018867925,
+        "f1_xss": 0.9607843137254902,
+        "confusion_matrix": {
+          "labels": [
+            0,
+            1
+          ],
+          "rows_actual_columns_predicted": [
+            [
+              3861,
+              0
+            ],
+            [
+              8,
+              98
+            ]
+          ],
+          "true_negative": 3861,
+          "false_positive": 0,
+          "false_negative": 8,
+          "true_positive": 98
+        },
+        "threshold": 0.5,
+        "threshold_meaning": "Hybrid signal at or above 0.5 is classified as XSS."
+      },
+      "errors": {
+        "false_positives": [],
+        "false_negatives": [
+          {
+            "text": "prompt(1);>",
+            "actual_label": 1,
+            "predicted_label": 0,
+            "signal": 0.2457287224956843
+          },
+          {
+            "text": "scriptalert(crosssitescripting)/script",
+            "actual_label": 1,
+            "predicted_label": 0,
+            "signal": 0.4995436953774879
+          },
+          {
+            "text": "<?xml:namespace prefix=\"t\" ns=\"urn:schemas-microsoft-com:time\">",
+            "actual_label": 1,
+            "predicted_label": 0,
+            "signal": 0.03385988004007473
+          },
+          {
+            "text": "write(1) autofocus>",
+            "actual_label": 1,
+            "predicted_label": 0,
+            "signal": 0.3323586831723384
+          },
+          {
+            "text": "x:expression8write(1)9>",
+            "actual_label": 1,
+            "predicted_label": 0,
+            "signal": 0.1344707848559848
+          }
+        ]
+      }
+    }
+  },
+  "performance": {
+    "local_measurement_only": true,
+    "samples": 3967,
+    "rule_total_seconds": 0.05757890000313637,
+    "ml_total_seconds": 0.10067690000141738,
+    "hybrid_total_seconds": 2.9835980999996536,
+    "rule_average_ms": 0.014514469373112269,
+    "ml_average_ms": 0.02537859843746342,
+    "hybrid_average_ms": 0.7521043861859474
+  },
+  "model": {
+    "model_file": "models/xss_logistic_regression.joblib",
+    "vectorizer_file": "models/xss_tfidf_vectorizer.joblib",
+    "vectorizer_fitted_on_training_only": true,
+    "tfidf_features": 54919,
+    "hybrid_weight_configuration": {
+      "rule_weight": 0.5,
+      "ml_weight": 0.5
+    }
+  },
+  "limitations": [
+    "Metrics apply only to the selected HttpParamsDataset held-out test split.",
+    "The test set is strongly imbalanced toward benign records.",
+    "The rule threshold is an experimental binary interpretation of any matched rule.",
+    "The ML and hybrid thresholds were not optimized on this test set.",
+    "Local timing measurements are not production-scale performance claims.",
+    "Dataset strings were processed as offline data and were not executed or sent externally."
+  ]
+}

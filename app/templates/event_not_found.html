@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}XShield | Event Not Found{% endblock %}
+
+{% block content %}
+<section class="workspace-section">
+    <div class="container">
+        <div class="result-card">
+            <p class="eyebrow">SECURITY EVENT</p>
+            <h1>Event not found</h1>
+            <p class="empty-state">No security event exists for ID {{ event_id }}.</p>
+            <a class="text-link" href="{{ url_for('main.dashboard') }}">Back to dashboard</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

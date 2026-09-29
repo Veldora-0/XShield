@@ -1,0 +1,20 @@
+{
+  "labels": [
+    0,
+    1
+  ],
+  "rows_actual_columns_predicted": [
+    [
+      3861,
+      0
+    ],
+    [
+      8,
+      98
+    ]
+  ],
+  "true_negative": 3861,
+  "false_positive": 0,
+  "false_negative": 8,
+  "true_positive": 98
+}

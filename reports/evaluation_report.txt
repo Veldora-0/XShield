@@ -1,0 +1,51 @@
+XShield Comparative Evaluation Report
+======================================
+
+Evaluation samples: 3967
+Class counts: {'0': 3861, '1': 106}
+All methods use the same held-out test set.
+
+Metrics (positive class: XSS / label 1)
+---------------------------------------
+Method       Accuracy     Precision    Recall       F1
+Rule-Based   0.99798336 1.00000000 0.92452830 0.96078431
+  confusion matrix: [[3861, 0], [8, 98]]
+  false positives: 0; false negatives: 8
+ML           0.99899168 1.00000000 0.96226415 0.98076923
+  confusion matrix: [[3861, 0], [4, 102]]
+  false positives: 0; false negatives: 4
+Hybrid       0.99798336 1.00000000 0.92452830 0.96078431
+  confusion matrix: [[3861, 0], [8, 98]]
+  false positives: 0; false negatives: 8
+
+Thresholds
+----------
+{
+  "rule_score": 1,
+  "ml_probability": 0.5,
+  "hybrid_signal": 0.5,
+  "experimental": true,
+  "note": "Thresholds were documented evaluation parameters and were not optimized on this test set."
+}
+
+Local timing observations
+-------------------------
+{
+  "local_measurement_only": true,
+  "samples": 3967,
+  "rule_total_seconds": 0.05757890000313637,
+  "ml_total_seconds": 0.10067690000141738,
+  "hybrid_total_seconds": 2.9835980999996536,
+  "rule_average_ms": 0.014514469373112269,
+  "ml_average_ms": 0.02537859843746342,
+  "hybrid_average_ms": 0.7521043861859474
+}
+
+Limitations
+-----------
+- Metrics apply only to the selected HttpParamsDataset held-out test split.
+- The test set is strongly imbalanced toward benign records.
+- The rule threshold is an experimental binary interpretation of any matched rule.
+- The ML and hybrid thresholds were not optimized on this test set.
+- Local timing measurements are not production-scale performance claims.
+- Dataset strings were processed as offline data and were not executed or sent externally.

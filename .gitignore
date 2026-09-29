@@ -1,0 +1,35 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+
+# Local environment and secret credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+secrets.json
+
+# Raw and generated artifacts excluded from the first commit
+data/raw/httpparamsdataset.zip
+data/raw/httpparamsdataset/
+data/raw/Xss_dataset.csv
+reports/ml_test_predictions.csv
+
+# Local application data
+*.db
+*.sqlite
+*.sqlite3
+
+# Generated model files
+*.joblib
+*.pkl
+
+# Keep the directories, but not generated log contents
+logs/*
+!logs/.gitkeep

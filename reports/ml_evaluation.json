@@ -1,0 +1,94 @@
+{
+  "dataset": {
+    "test_file": "data/processed/xss_test.csv",
+    "samples": 3967,
+    "text_column": "text",
+    "label_column": "label",
+    "positive_class": {
+      "label": 1,
+      "meaning": "XSS"
+    },
+    "class_counts": {
+      "0": 3861,
+      "1": 106
+    }
+  },
+  "model": {
+    "name": "LogisticRegression",
+    "model_file": "models/xss_logistic_regression.joblib",
+    "vectorizer_file": "models/xss_tfidf_vectorizer.joblib",
+    "vectorizer": {
+      "analyzer": "char",
+      "ngram_range": [
+        3,
+        5
+      ],
+      "min_df": 2,
+      "sublinear_tf": true,
+      "features": 54919
+    }
+  },
+  "metrics": {
+    "accuracy": 0.9989916813713133,
+    "precision_xss": 1.0,
+    "recall_xss": 0.9622641509433962,
+    "f1_xss": 0.9807692307692307
+  },
+  "confusion_matrix": {
+    "labels": [
+      0,
+      1
+    ],
+    "rows_actual_columns_predicted": [
+      [
+        3861,
+        0
+      ],
+      [
+        4,
+        102
+      ]
+    ],
+    "true_negative": 3861,
+    "false_positive": 0,
+    "false_negative": 4,
+    "true_positive": 102
+  },
+  "misclassifications": {
+    "false_positive_count": 0,
+    "false_negative_count": 4,
+    "representative_false_positives": [],
+    "representative_false_negatives": [
+      {
+        "text": "prompt(1);>",
+        "actual_label": 1,
+        "predicted_label": 0,
+        "xss_probability": 0.4914574449913686
+      },
+      {
+        "text": "<?xml:namespace prefix=\"t\" ns=\"urn:schemas-microsoft-com:time\">",
+        "actual_label": 1,
+        "predicted_label": 0,
+        "xss_probability": 0.06771976008014946
+      },
+      {
+        "text": "x:expression8write(1)9>",
+        "actual_label": 1,
+        "predicted_label": 0,
+        "xss_probability": 0.2689415697119696
+      },
+      {
+        "text": "a=\"get\";",
+        "actual_label": 1,
+        "predicted_label": 0,
+        "xss_probability": 0.04458214457986242
+      }
+    ]
+  },
+  "limitations": [
+    "Results apply only to this selected dataset and held-out split.",
+    "The test set is strongly imbalanced toward benign records.",
+    "A correct test prediction does not prove behavior in every browser or application context.",
+    "Misclassification examples are offline analysis data and were not sent to external services."
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "training_samples": 15869,
+  "test_samples": 3967,
+  "tfidf_features": 54919,
+  "tfidf_configuration": {
+    "analyzer": "char",
+    "ngram_range": [
+      3,
+      5
+    ],
+    "min_df": 2,
+    "sublinear_tf": true,
+    "fit_on": "training text only"
+  },
+  "logistic_regression_configuration": {
+    "class_weight": "balanced",
+    "max_iter": 1000,
+    "random_state": 42,
+    "solver": "liblinear"
+  },
+  "training_class_counts": {
+    "0": 15443,
+    "1": 426
+  },
+  "test_class_counts": {
+    "0": 3861,
+    "1": 106
+  },
+  "saved_vectorizer": "models/xss_tfidf_vectorizer.joblib",
+  "saved_model": "models/xss_logistic_regression.joblib",
+  "evaluation_metrics": "Not calculated in Phase 6."
+}

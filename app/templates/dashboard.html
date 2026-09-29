@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}XShield | Security Dashboard{% endblock %}
+
+{% block content %}
+<section class="workspace-section dashboard-section">
+    <div class="container">
+        <div class="section-heading dashboard-heading">
+            <p class="eyebrow">SECURITY MONITORING</p>
+            <h1>XShield Security Dashboard</h1>
+            <p>Monitoring data comes from stored SQLite security events. This page contains no detection logic.</p>
+        </div>
+
+        <div class="dashboard-cards">
+            <div class="dashboard-card"><span class="summary-label">TOTAL EVENTS</span><strong>{{ stats.total_events }}</strong></div>
+            <div class="dashboard-card"><span class="summary-label">LOW RISK</span><strong>{{ stats.risk_counts.Low }}</strong></div>
+            <div class="dashboard-card"><span class="summary-label">MEDIUM RISK</span><strong>{{ stats.risk_counts.Medium }}</strong></div>
+            <div class="dashboard-card"><span class="summary-label">HIGH RISK</span><strong>{{ stats.risk_counts.High }}</strong></div>
+            <div class="dashboard-card"><span class="summary-label">CRITICAL</span><strong>{{ stats.risk_counts.Critical }}</strong></div>
+            <div class="dashboard-card"><span class="summary-label">BLOCKED</span><strong>{{ stats.blocked_events }}</strong></div>
+        </div>
+
+        <div class="dashboard-panel">
+            <div class="panel-heading">
+                <div>
+                    <p class="eyebrow">RISK DISTRIBUTION</p>
+                    <h2>Stored event levels</h2>
+                </div>
+            </div>
+            {% if stats.total_events %}
+            <div class="risk-bars">
+                {% for level in ("Low", "Medium", "High", "Critical") %}
+                {% set count = stats.risk_counts[level] %}
+                <div class="risk-bar-row">
+                    <span>{{ level }}</span>
+                    <div class="risk-bar-track"><div class="risk-bar risk-{{ level|lower }}" style="width: {{ ((count / stats.total_events) * 100)|round(2) }}%"></div></div>
+                    <strong>{{ count }}</strong>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="empty-state">No security events recorded yet.</p>
+            {% endif %}
+        </div>
+
+        <div class="dashboard-panel">
+            <div class="panel-heading">
+                <div>
+                    <p class="eyebrow">EVENT REVIEW</p>
+                    <h2>Recent security events</h2>
+                </div>
+            </div>
+            <form class="dashboard-filters" method="get" action="{{ url_for('main.dashboard') }}">
+                <label>
+                    Risk level
+                    <select name="risk_level">
+                        {% for level in ("All", "Low", "Medium", "High", "Critical") %}
+                        <option value="{{ level }}" {% if selected_risk == level %}selected{% endif %}>{{ level }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label>
+                    Action
+                    <select name="action">
+                        {% for value, label in (("All", "All"), ("allow", "Allow"), ("flag", "Flag"), ("block", "Block"), ("block_and_alert", "Block + Alert")) %}
+                        <option value="{{ value }}" {% if selected_action == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label>
+                    Search
+                    <input type="search" name="search" value="{{ search }}" maxlength="100" placeholder="Input, ML label, agreement">
+                </label>
+                <button class="primary-button filter-button" type="submit">Apply filters</button>
+            </form>
+            {% if events %}
+            <div class="table-wrapper">
+                <table class="events-table">
+                    <thead><tr><th>ID</th><th>Timestamp</th><th>Risk</th><th>Score</th><th>ML</th><th>Probability</th><th>Action</th><th>Agreement</th></tr></thead>
+                    <tbody>
+                    {% for event in events %}
+                    <tr>
+                        <td><a href="{{ url_for('main.dashboard_event', event_id=event.id) }}">#{{ event.id }}</a></td>
+                        <td>{{ event.timestamp }}</td>
+                        <td><span class="risk-label risk-{{ event.risk_level|lower }}">{{ event.risk_level }}</span></td>
+                        <td>{{ "%.2f"|format(event.risk_score) }}</td>
+                        <td>{{ event.ml_prediction }}</td>
+                        <td>{{ "%.4f"|format(event.ml_probability) }}</td>
+                        <td>{{ event.action }}</td>
+                        <td>{{ event.detector_agreement }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="empty-state">No matching security events.</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

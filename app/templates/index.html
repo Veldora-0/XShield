@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+
+{% block title %}XShield | Input Analysis{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="container hero-grid">
+        <div class="hero-copy">
+            <p class="eyebrow">SECURITY OPERATIONS / INPUT REVIEW</p>
+            <h1>Understand your input before it reaches the application.</h1>
+            <p class="hero-description">
+                XShield combines explainable security rules and machine
+                learning to assess user-controlled input for potential XSS
+                risk.
+            </p>
+            <div class="feature-row" aria-label="XShield capabilities">
+                <div class="feature-item">
+                    <span class="feature-icon" aria-hidden="true">01</span>
+                    <span>Structured risk assessment</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon" aria-hidden="true">02</span>
+                    <span>Explainable security workflow</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-summary">
+            <div class="summary-label">CURRENT MODULE</div>
+            <div class="summary-title">Input Workspace</div>
+            <p>Submit local sample data for detection and risk assessment.</p>
+            <div class="summary-line">
+                <span>Detection engine</span>
+                <span class="summary-value">Rule + ML hybrid</span>
+            </div>
+            <div class="summary-line">
+                <span>Analysis status</span>
+                <span class="summary-value summary-ready">Ready for input</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="workspace-section">
+    <div class="container workspace-grid">
+        <div class="section-heading">
+            <p class="eyebrow">INPUT WORKSPACE</p>
+            <h2>Submit information for review</h2>
+            <p>
+                This form validates input, runs rule and ML detectors, applies
+                the hybrid risk engine and response policy, and records the
+                completed event locally.
+            </p>
+        </div>
+
+        <div class="form-card">
+            <div class="security-notice">
+                <strong>User input is treated as untrusted data.</strong>
+                <span>Values are validated on the server and escaped when displayed.</span>
+            </div>
+            <form method="post" action="{{ url_for('main.index') }}" id="analysis-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="Enter a username"
+                        required
+                        maxlength="100"
+                        value="{{ form_values.username }}"
+                    >
+                    {% if errors.username %}
+                    <p class="field-error">{{ errors.username }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="search_query">Search Query</label>
+                    <input
+                        type="text"
+                        id="search_query"
+                        name="search_query"
+                        placeholder="What would you like to search for?"
+                        required
+                        maxlength="200"
+                        value="{{ form_values.search_query }}"
+                    >
+                    {% if errors.search_query %}
+                    <p class="field-error">{{ errors.search_query }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="comment">Comment / Feedback</label>
+                    <textarea
+                        id="comment"
+                        name="comment"
+                        rows="6"
+                        placeholder="Enter a comment or feedback message"
+                        required
+                        maxlength="1000"
+                    >{{ form_values.comment }}</textarea>
+                    {% if errors.comment %}
+                    <p class="field-error">{{ errors.comment }}</p>
+                    {% endif %}
+                </div>
+
+                <p class="form-note">
+                    Validation checks format and length. It is not XSS
+                    detection or a replacement for output encoding.
+                </p>
+                <button type="submit" class="primary-button">
+                    Analyze Input
+                    <span aria-hidden="true">&rarr;</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+{% if detection_result %}
+<section class="result-section">
+    <div class="container">
+        <div class="result-card">
+            <div class="result-header">
+                <div>
+                        <p class="eyebrow">RULE-BASED ANALYSIS</p>
+                    <h2>Input received and analyzed</h2>
+                </div>
+                <span class="received-badge">Received</span>
+            </div>
+            <p class="result-description">
+                Flask received the submitted values. They are displayed as
+                escaped text and analyzed by independent rule and ML detectors.
+                This result is an indicator, not a final risk decision.
+            </p>
+            <div class="detection-summary">
+                <div>
+                    <span class="summary-label">RULE DETECTOR</span>
+                    <strong>
+                        {% if detection_result.rule_result.is_suspicious %}
+                        Suspicious characteristics detected
+                        {% else %}
+                        No suspicious characteristics detected
+                        {% endif %}
+                    </strong>
+                </div>
+                <div class="score-display">
+                    <span class="summary-label">RULE SCORE</span>
+                    <strong>{{ detection_result.rule_result.score }} / 100</strong>
+                </div>
+            </div>
+            {% if detection_result.rule_result.rule_details %}
+            <div class="matched-rules">
+                <h3>Rule detector details</h3>
+                {% for rule in detection_result.rule_result.rule_details %}
+                <div class="rule-item">
+                    <div>
+                        <strong>{{ rule.rule_id }} &middot; {{ rule.name }}</strong>
+                        <span>{{ rule.field }} field &middot; {{ rule.reason }}</span>
+                    </div>
+                    <span class="rule-weight">+{{ rule.weight }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="no-rules">No rule indicators matched this submission.</p>
+            {% endif %}
+            <div class="detection-summary">
+                <div>
+                    <span class="summary-label">ML DETECTOR</span>
+                    <strong>{{ detection_result.ml_result.prediction|capitalize }}</strong>
+                </div>
+                <div class="score-display">
+                    <span class="summary-label">XSS PROBABILITY</span>
+                    <strong>{{ "%.4f"|format(detection_result.ml_result.probability) }}</strong>
+                </div>
+            </div>
+            <div class="detection-summary">
+                <div>
+                    <span class="summary-label">HYBRID SIGNAL</span>
+                    <strong>{{ "%.4f"|format(detection_result.hybrid.hybrid_signal) }}</strong>
+                </div>
+                <div class="score-display">
+                    <span class="summary-label">AGREEMENT</span>
+                    <strong>{{ detection_result.hybrid.agreement }}</strong>
+                </div>
+            </div>
+            <div class="matched-rules">
+                <h3>Hybrid detector details</h3>
+                <div class="rule-item">
+                    <div>
+                        <strong>Rule contribution</strong>
+                        <span>
+                            Normalized score {{ "%.4f"|format(detection_result.hybrid.rule_score_normalized) }}
+                            &times; weight {{ "%.2f"|format(detection_result.hybrid.rule_weight) }}
+                        </span>
+                    </div>
+                    <span class="rule-weight">{{ "%.4f"|format(detection_result.hybrid.rule_contribution) }}</span>
+                </div>
+                <div class="rule-item">
+                    <div>
+                        <strong>ML contribution</strong>
+                        <span>
+                            XSS probability {{ "%.4f"|format(detection_result.hybrid.ml_score) }}
+                            &times; weight {{ "%.2f"|format(detection_result.hybrid.ml_weight) }}
+                        </span>
+                    </div>
+                    <span class="rule-weight">{{ "%.4f"|format(detection_result.hybrid.ml_contribution) }}</span>
+                </div>
+            </div>
+            <div class="detection-summary">
+                <div>
+                    <span class="summary-label">RISK ASSESSMENT</span>
+                    <strong>{{ detection_result.risk_result.risk_level }}</strong>
+                </div>
+                <div class="score-display">
+                    <span class="summary-label">RISK SCORE</span>
+                    <strong>{{ "%.2f"|format(detection_result.risk_result.risk_score) }} / 100</strong>
+                </div>
+            </div>
+            <div class="matched-rules">
+                <h3>Risk assessment reasons</h3>
+                {% for reason in detection_result.risk_result.reasons %}
+                <div class="rule-item">
+                    <div><span>{{ reason }}</span></div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="detection-summary">
+                <div>
+                    <span class="summary-label">RESPONSE ACTION</span>
+                    <strong>{{ detection_result.action_result.action }}</strong>
+                </div>
+                <div class="score-display">
+                    <span class="summary-label">STATUS</span>
+                    <strong>
+                        {% if detection_result.action_result.blocked %}
+                        Rejected
+                        {% else %}
+                        Continued safely
+                        {% endif %}
+                    </strong>
+                </div>
+            </div>
+            <div class="matched-rules">
+                <h3>Response decision</h3>
+                <div class="rule-item">
+                    <div>
+                        <strong>{{ detection_result.action_result.action_message }}</strong>
+                        <span>{{ detection_result.action_result.reason }}</span>
+                    </div>
+                </div>
+                {% if detection_result.action_result.alert_required %}
+                <div class="rule-item">
+                    <div>
+                        <strong>Future alert marker</strong>
+                        <span>No alert was sent in this phase.</span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% if detection_result.action_result.blocked %}
+            <p class="no-rules">
+                The submitted content is not displayed because the prototype
+                response action rejected it. No firewall or external blocking
+                was performed.
+            </p>
+            {% endif %}
+            <div class="matched-rules">
+                <h3>Security event logging</h3>
+                {% if detection_result.logging_result.stored %}
+                <div class="rule-item">
+                    <div>
+                        <strong>Event stored</strong>
+                        <span>
+                            Security event ID {{ detection_result.logging_result.event_id }}
+                            was stored with a UTC timestamp.
+                        </span>
+                    </div>
+                </div>
+                {% else %}
+                <div class="rule-item">
+                    <div>
+                        <strong>Event was not stored</strong>
+                        <span>{{ detection_result.logging_result.error }}</span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% if submitted_input %}
+            <dl class="submitted-list">
+                <div>
+                    <dt>Username</dt>
+                    <dd>{{ submitted_input.username }}</dd>
+                </div>
+                <div>
+                    <dt>Search Query</dt>
+                    <dd>{{ submitted_input.search_query }}</dd>
+                </div>
+                <div>
+                    <dt>Comment / Feedback</dt>
+                    <dd class="submitted-comment">{{ submitted_input.comment }}</dd>
+                </div>
+            </dl>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
