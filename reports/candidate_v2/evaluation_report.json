@@ -1,0 +1,318 @@
+{
+  "timestamp": "2026-09-30T07:10:19.403076+00:00",
+  "summary_comparison": {
+    "vocabulary_size": {
+      "v1": 54919,
+      "v2": 70773,
+      "delta": 15854
+    },
+    "artifact_size_kb": {
+      "v1": 1404.0,
+      "v2": 1821.1,
+      "delta": 417.1
+    },
+    "mean_latency_ms": {
+      "v1": 1.493,
+      "v2": 0.631,
+      "delta": -0.862
+    },
+    "qualitative_pass_rate": {
+      "v1": "23/25 (92.0%)",
+      "v2": "23/25 (92.0%)"
+    }
+  },
+  "benchmark_v1_results": {
+    "v1_baseline": {
+      "dataset": "xss_test.csv",
+      "total_samples": 3967,
+      "benign_samples": 3861,
+      "xss_samples": 106,
+      "accuracy": 0.99899,
+      "precision": 1.0,
+      "recall": 0.96226,
+      "f1": 0.98077,
+      "tp": 102,
+      "fp": 0,
+      "tn": 3861,
+      "fn": 4,
+      "confusion_matrix": [
+        [
+          3861,
+          0
+        ],
+        [
+          4,
+          102
+        ]
+      ]
+    },
+    "v2_candidate": {
+      "dataset": "xss_test.csv",
+      "total_samples": 3967,
+      "benign_samples": 3861,
+      "xss_samples": 106,
+      "accuracy": 0.99924,
+      "precision": 1.0,
+      "recall": 0.9717,
+      "f1": 0.98565,
+      "tp": 103,
+      "fp": 0,
+      "tn": 3861,
+      "fn": 3,
+      "confusion_matrix": [
+        [
+          3861,
+          0
+        ],
+        [
+          3,
+          103
+        ]
+      ]
+    }
+  },
+  "benchmark_v2_results": {
+    "v1_baseline": {
+      "dataset": "benchmark_v2.csv",
+      "total_samples": 3175,
+      "benign_samples": 2375,
+      "xss_samples": 800,
+      "accuracy": 0.99433,
+      "precision": 1.0,
+      "recall": 0.9775,
+      "f1": 0.98862,
+      "tp": 782,
+      "fp": 0,
+      "tn": 2375,
+      "fn": 18,
+      "confusion_matrix": [
+        [
+          2375,
+          0
+        ],
+        [
+          18,
+          782
+        ]
+      ]
+    },
+    "v2_candidate": {
+      "dataset": "benchmark_v2.csv",
+      "total_samples": 3175,
+      "benign_samples": 2375,
+      "xss_samples": 800,
+      "accuracy": 0.99465,
+      "precision": 1.0,
+      "recall": 0.97875,
+      "f1": 0.98926,
+      "tp": 783,
+      "fp": 0,
+      "tn": 2375,
+      "fn": 17,
+      "confusion_matrix": [
+        [
+          2375,
+          0
+        ],
+        [
+          17,
+          783
+        ]
+      ]
+    }
+  },
+  "qualitative_v1": {
+    "passed": 23,
+    "total": 25,
+    "categories": {
+      "A": {
+        "category_name": "Simple XSS",
+        "total": 3,
+        "passed": 3,
+        "failed": 0
+      },
+      "B": {
+        "category_name": "Event-Handler XSS",
+        "total": 4,
+        "passed": 4,
+        "failed": 0
+      },
+      "C": {
+        "category_name": "javascript: URLs",
+        "total": 3,
+        "passed": 3,
+        "failed": 0
+      },
+      "D": {
+        "category_name": "Encoded / Entity Payloads",
+        "total": 3,
+        "passed": 3,
+        "failed": 0
+      },
+      "E": {
+        "category_name": "Obfuscated / Evasion Payloads",
+        "total": 3,
+        "passed": 3,
+        "failed": 0
+      },
+      "F": {
+        "category_name": "Syntax-Sparse / Naked JS",
+        "total": 3,
+        "passed": 1,
+        "failed": 2
+      },
+      "G": {
+        "category_name": "Benign Developer Discussions",
+        "total": 3,
+        "passed": 3,
+        "failed": 0
+      },
+      "H": {
+        "category_name": "Ordinary Enterprise Web Text",
+        "total": 3,
+        "passed": 3,
+        "failed": 0
+      }
+    }
+  },
+  "qualitative_v2": {
+    "passed": 23,
+    "total": 25,
+    "categories": {
+      "A": {
+        "category_name": "Simple XSS",
+        "total": 3,
+        "passed": 3,
+        "failed": 0
+      },
+      "B": {
+        "category_name": "Event-Handler XSS",
+        "total": 4,
+        "passed": 4,
+        "failed": 0
+      },
+      "C": {
+        "category_name": "javascript: URLs",
+        "total": 3,
+        "passed": 3,
+        "failed": 0
+      },
+      "D": {
+        "category_name": "Encoded / Entity Payloads",
+        "total": 3,
+        "passed": 3,
+        "failed": 0
+      },
+      "E": {
+        "category_name": "Obfuscated / Evasion Payloads",
+        "total": 3,
+        "passed": 3,
+        "failed": 0
+      },
+      "F": {
+        "category_name": "Syntax-Sparse / Naked JS",
+        "total": 3,
+        "passed": 1,
+        "failed": 2
+      },
+      "G": {
+        "category_name": "Benign Developer Discussions",
+        "total": 3,
+        "passed": 3,
+        "failed": 0
+      },
+      "H": {
+        "category_name": "Ordinary Enterprise Web Text",
+        "total": 3,
+        "passed": 3,
+        "failed": 0
+      }
+    }
+  },
+  "regression_gate_v2": {
+    "verdict": "ACCEPT_CANDIDATE",
+    "passed": true,
+    "violations": [],
+    "violation_count": 0,
+    "gate_results": {
+      "benchmark_v1": {
+        "total_samples": 3967,
+        "accuracy": 0.99924,
+        "precision": 1.0,
+        "recall": 0.9717,
+        "f1": 0.98565,
+        "true_positive": 103,
+        "false_positive": 0,
+        "true_negative": 3861,
+        "false_negative": 3
+      },
+      "benchmark_v2": {
+        "total_samples": 3175,
+        "accuracy": 0.99465,
+        "precision": 1.0,
+        "recall": 0.97875,
+        "f1": 0.98926,
+        "true_positive": 783,
+        "false_positive": 0,
+        "true_negative": 2375,
+        "false_negative": 17
+      },
+      "qualitative_suite": {
+        "total": 25,
+        "passed": 23,
+        "pass_rate_pct": 92.0,
+        "category_summary": {
+          "A": {
+            "category_name": "Simple XSS",
+            "total": 3,
+            "passed": 3,
+            "failed": 0
+          },
+          "B": {
+            "category_name": "Event-Handler XSS",
+            "total": 4,
+            "passed": 4,
+            "failed": 0
+          },
+          "C": {
+            "category_name": "javascript: URLs",
+            "total": 3,
+            "passed": 3,
+            "failed": 0
+          },
+          "D": {
+            "category_name": "Encoded / Entity Payloads",
+            "total": 3,
+            "passed": 3,
+            "failed": 0
+          },
+          "E": {
+            "category_name": "Obfuscated / Evasion Payloads",
+            "total": 3,
+            "passed": 3,
+            "failed": 0
+          },
+          "F": {
+            "category_name": "Syntax-Sparse / Naked JS",
+            "total": 3,
+            "passed": 1,
+            "failed": 2
+          },
+          "G": {
+            "category_name": "Benign Developer Discussions",
+            "total": 3,
+            "passed": 3,
+            "failed": 0
+          },
+          "H": {
+            "category_name": "Ordinary Enterprise Web Text",
+            "total": 3,
+            "passed": 3,
+            "failed": 0
+          }
+        }
+      },
+      "mean_latency_ms": 0.665
+    }
+  }
+}

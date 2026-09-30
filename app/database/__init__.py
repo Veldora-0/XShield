@@ -14,6 +14,7 @@ from app.database.db import (
     get_recent_application_events,
     initialize_database,
     list_applications,
+    reset_demo_events,
     set_application_status,
 )
 
@@ -33,5 +34,6 @@ __all__ = [
     "get_recent_application_events",
     "initialize_database",
     "list_applications",
+    "reset_demo_events",
     "set_application_status",
 ]

@@ -249,18 +249,13 @@ events, a risk distribution, up to 50 newest events, risk/action filters, text
 search, and event details. Event text is rendered through normal Jinja
 escaping.
 
-Dashboard routes require HTTP Basic Authentication. Configure credentials
-before starting the application:
+XShield console is unauthenticated in local demonstration mode. API ingestion remains authenticated using X-API-Key.
 
 ```powershell
-$env:XSHIELD_DASHBOARD_USERNAME = "admin"
-$env:XSHIELD_DASHBOARD_PASSWORD = "choose-a-local-password"
 .\.venv\Scripts\python.exe -m app
 ```
 
-If no password is configured, the dashboard returns `503` rather than
-exposing stored events. Basic Authentication is a minimal local-prototype
-control, not a complete production identity system.
+The unauthenticated console is intended specifically for local development and controlled demonstration. It is not designed or represented as a production-secure deployment configuration. API endpoints (`POST /api/v1/events`) continue to strictly require valid `X-API-Key` headers.
 
 ## 13. Dataset
 
@@ -404,22 +399,44 @@ artifacts already exist.
 
 ## 19. Running XShield
 
-Configure dashboard credentials and start the application:
+Start the application:
 
 ```powershell
-$env:XSHIELD_DASHBOARD_USERNAME = "admin"
-$env:XSHIELD_DASHBOARD_PASSWORD = "choose-a-local-password"
 .\.venv\Scripts\python.exe -m app
 ```
+
+> **Note:** XShield console is unauthenticated in local demonstration mode. API ingestion remains authenticated using X-API-Key.
 
 Open:
 
 - Application: <http://127.0.0.1:5000/>
 - Health check: <http://127.0.0.1:5000/health>
-- Dashboard: <http://127.0.0.1:5000/dashboard>
+- Security Console: <http://127.0.0.1:5000/dashboard>
 
 The development entry point keeps debug mode disabled unless
 `XSHIELD_DEBUG=true` is explicitly set.
+
+### Fresh Demo
+
+For a clean demonstration starting from zero recorded telemetry:
+
+1. Reset local demo telemetry:
+   ```powershell
+   .\.venv\Scripts\python.exe scripts/reset_demo_data.py
+   ```
+2. Confirm with:
+   ```text
+   RESET
+   ```
+3. Start XShield.
+4. Start ApexTestWebsite.
+5. Generate demonstration events.
+6. Inspect events in the Security Operations Console (`/dashboard`).
+7. Restart XShield to demonstrate persistence.
+
+> **Important Persistence Note:** XShield does not clear security events on startup. Events are persistent local telemetry stored in SQLite.
+>
+> The reset command is an explicit local demonstration utility and should not be treated as a production data-retention mechanism.
 
 ## 20. Testing
 

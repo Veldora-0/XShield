@@ -1,0 +1,56 @@
+{
+  "acquisition_date": "2026-09-30",
+  "curator": "XShield Research & ML Team",
+  "description": "Multi-source raw dataset acquisition for ML Benchmark v2",
+  "sources": [
+    {
+      "name": "SecLists XSS Robot-Friendly",
+      "repository": "https://github.com/danielmiessler/SecLists",
+      "license": "MIT License",
+      "verified": true,
+      "author": "Daniel Miessler and contributors",
+      "files": [
+        "seclists_portswigger.txt",
+        "seclists_payloadbox.txt",
+        "seclists_jhaddix.txt",
+        "seclists_rsnake.txt",
+        "seclists_mario.txt",
+        "seclists_brutelogic.txt",
+        "seclists_fuzzing.txt",
+        "seclists_somdev.txt",
+        "seclists_ofjaaah.txt",
+        "seclists_noparen.txt"
+      ]
+    },
+    {
+      "name": "PayloadsAllTheThings XSS",
+      "repository": "https://github.com/swisskyrepo/PayloadsAllTheThings",
+      "license": "MIT License",
+      "verified": true,
+      "author": "Swissky and contributors",
+      "files": [
+        "payloadsallthethings_xss.txt"
+      ]
+    },
+    {
+      "name": "Curated Benign Technical Corpus",
+      "repository": "internal://xshield-benchmark-curation",
+      "license": "CC0-1.0 (Public Domain)",
+      "verified": true,
+      "description": "Realistic technical phrases containing sensitive keywords (JavaScript, alert, script, innerHTML, document, HTML)",
+      "files": [
+        "benign_technical_corpus.json"
+      ]
+    },
+    {
+      "name": "HTTPParams Dataset (Norm Class)",
+      "repository": "data/raw/httpparamsdataset/payload_full.csv",
+      "license": "Research / Academic (CSIC/HTTPParams)",
+      "verified": true,
+      "description": "Base benign HTTP parameters from V1 training",
+      "files": [
+        "payload_full.csv"
+      ]
+    }
+  ]
+}

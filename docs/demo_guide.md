@@ -5,15 +5,37 @@ outputs below were produced during an isolated demonstration with a temporary
 SQLite database; live values such as event IDs and timestamps may differ.
 Submitted strings are treated as data and are never executed.
 
+### Fresh Demo
+
+For a clean presentation from a zero-event baseline:
+
+1. Reset local demo telemetry:
+   ```powershell
+   .\.venv\Scripts\python.exe scripts/reset_demo_data.py
+   ```
+2. Confirm with:
+   ```text
+   RESET
+   ```
+3. Start XShield.
+4. Start ApexTestWebsite.
+5. Generate demonstration events.
+6. Inspect events in the Security Operations Console.
+7. Restart XShield to demonstrate persistence.
+
+> **Important Persistence Note:** XShield does not clear security events on startup. Events are persistent local telemetry stored in SQLite.
+>
+> The reset command is an explicit local demonstration utility and should not be treated as a production data-retention mechanism.
+
 ## Step 1 - Start the Application
 
 From the project root in PowerShell:
 
 ```powershell
-$env:XSHIELD_DASHBOARD_USERNAME = "admin"
-$env:XSHIELD_DASHBOARD_PASSWORD = "choose-a-local-password"
 .\.venv\Scripts\python.exe -m app
 ```
+
+> **Note:** XShield console is unauthenticated in local demonstration mode. API ingestion remains authenticated using X-API-Key.
 
 The application starts with debug disabled by default. Keep the terminal
 visible during the demonstration so startup errors are observable.
@@ -86,8 +108,10 @@ while the security event remains available for review.
 
 ## Step 5 - Open the Dashboard
 
-Open <http://127.0.0.1:5000/dashboard> and enter the configured Basic
-Authentication credentials.
+Open <http://127.0.0.1:5000/dashboard>. The local Security Operations Console
+is intentionally unauthenticated for the demonstration/viva environment — no
+login or credentials are required. (The XShield ingestion API `POST
+/api/v1/events` remains authenticated using `X-API-Key`.)
 
 Show:
 
@@ -120,8 +144,7 @@ Select the suspicious event ID from the recent-events table. Show:
 - response action;
 - stored reasons.
 
-Point out that stored input is rendered as escaped text. The event detail route
-uses the same dashboard authentication as the dashboard route.
+Point out that stored input is rendered as escaped text. In this local demonstration mode, the event detail route is directly accessible without dashboard credentials.
 
 ## Step 7 - Show Evaluation Results
 

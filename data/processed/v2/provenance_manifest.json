@@ -1,0 +1,105 @@
+{
+  "created_at": "2026-09-30T07:07:35.215286+00:00",
+  "random_seed": 42,
+  "dataset_composition": {
+    "total_unique_safe_samples": 24327,
+    "train_v2": {
+      "total": 17979,
+      "benign": 11444,
+      "xss": 6535
+    },
+    "val_v2": {
+      "total": 3173,
+      "benign": 2020,
+      "xss": 1153
+    },
+    "benchmark_v2": {
+      "total": 3175,
+      "benign": 2375,
+      "xss": 800
+    },
+    "frozen_benchmark_v1": {
+      "total": 3967,
+      "benign": 3861,
+      "xss": 106,
+      "status": "IMMUTABLE_FROZEN"
+    }
+  },
+  "sources": {
+    "HTTPParams-V1-Train": {
+      "benign": 15443,
+      "xss": 426,
+      "total": 15869
+    },
+    "SecLists-seclists_brutelogic": {
+      "benign": 0,
+      "xss": 101,
+      "total": 101
+    },
+    "SecLists-seclists_fuzzing": {
+      "benign": 0,
+      "xss": 534,
+      "total": 534
+    },
+    "SecLists-seclists_jhaddix": {
+      "benign": 0,
+      "xss": 102,
+      "total": 102
+    },
+    "SecLists-seclists_mario": {
+      "benign": 0,
+      "xss": 135,
+      "total": 135
+    },
+    "SecLists-seclists_noparen": {
+      "benign": 0,
+      "xss": 8,
+      "total": 8
+    },
+    "SecLists-seclists_ofjaaah": {
+      "benign": 0,
+      "xss": 1083,
+      "total": 1083
+    },
+    "SecLists-seclists_payloadbox": {
+      "benign": 0,
+      "xss": 15,
+      "total": 15
+    },
+    "SecLists-seclists_portswigger": {
+      "benign": 0,
+      "xss": 6041,
+      "total": 6041
+    },
+    "SecLists-seclists_rsnake": {
+      "benign": 0,
+      "xss": 10,
+      "total": 10
+    },
+    "SecLists-seclists_somdev": {
+      "benign": 0,
+      "xss": 20,
+      "total": 20
+    },
+    "PayloadsAllTheThings-XSS": {
+      "benign": 0,
+      "xss": 23,
+      "total": 23
+    },
+    "Curated-Benign-Technical": {
+      "benign": 396,
+      "xss": 0,
+      "total": 396
+    }
+  },
+  "licenses": {
+    "Academic/Research (CSIC/HTTPParams)": 15869,
+    "MIT License": 8072,
+    "CC0-1.0 (Public Domain)": 396
+  },
+  "leakage_verification": {
+    "v1_test_overlap_count": 0,
+    "benchmark_v2_train_overlap_count": 0,
+    "status": "VERIFIED_ZERO_CONTAMINATION"
+  }
+}

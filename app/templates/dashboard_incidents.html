@@ -1,0 +1,85 @@
+{% extends "base_console.html" %}
+
+{% block title %}XShield Console &middot; Incident Correlation{% endblock %}
+{% block console_title %}Incident Correlation Engine{% endblock %}
+
+{% block content %}
+<div class="dashboard-page">
+    <section class="soc-hero">
+        <div class="soc-hero-content">
+            <div class="soc-hero-title-area">
+                <div class="soc-eyebrow">
+                    <span class="eyebrow-dot"></span>
+                    <span>PHASE 7 AUTOMATED CLUSTERING</span>
+                </div>
+                <h1 class="soc-headline">Correlated Security Incidents</h1>
+                <p class="soc-subheadline">
+                    Automated, explainable multi-event incident grouping derived from shared request IDs, normalized endpoint repetition, or overlapping detection patterns.
+                </p>
+            </div>
+            <div class="panel-meta-chip">
+                <span>Correlation Window: 300s &middot; In-Memory Derived</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="soc-card soc-panel">
+        <div class="panel-heading">
+            <div class="panel-title-area">
+                <h2>Active Incident Clusters</h2>
+            </div>
+            <span class="panel-meta">Derived dynamically from bounded event history</span>
+        </div>
+
+        {% if incidents %}
+        <div class="incident-cards-grid">
+            {% for incident in incidents %}
+            <article class="incident-card risk-border-{{ incident.risk_level|lower }}">
+                <div class="incident-card-top">
+                    <div class="incident-id-group">
+                        <span class="incident-prefix">INCIDENT</span>
+                        <code class="incident-id-hash">{{ incident.incident_id }}</code>
+                    </div>
+                    <span class="badge risk-badge risk-{{ incident.risk_level|lower }}">
+                        <span class="badge-dot"></span>
+                        {{ incident.risk_level }} Risk
+                    </span>
+                </div>
+
+                <div class="incident-card-mid">
+                    <div class="incident-app-row">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"></rect><rect x="2" y="14" width="20" height="8" rx="2"></rect></svg>
+                        <strong>Application: {{ incident.application_name }}</strong>
+                    </div>
+                    <div class="incident-count-chip">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        <span>{{ incident.event_count }} Correlated Events</span>
+                    </div>
+                </div>
+
+                <div class="incident-reasons-wrap">
+                    <span class="reasons-label">Explainable Correlation Logic:</span>
+                    <span class="table-subtext reasons-text">{{ incident.correlation_reasons|join("; ") }}</span>
+                </div>
+
+                <div class="incident-card-bottom">
+                    <div class="incident-timeline">
+                        <span>Cluster Started: <strong class="mono-sub">{{ incident.started_at }}</strong></span>
+                        <span>Latest Activity: <strong class="mono-sub">{{ incident.latest_event_at }}</strong></span>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="soc-empty-box">
+            <div class="empty-icon" aria-hidden="true">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            </div>
+            <p class="empty-state">No incidents derived from current event history.</p>
+            <p class="empty-guidance">Incidents require either a Critical/High-risk event or multiple related attacks sharing an endpoint or request ID within a 5-minute window. You can trigger an incident cluster in the Demo App.</p>
+        </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

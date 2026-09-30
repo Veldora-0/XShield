@@ -72,22 +72,32 @@ class RiskEngineTests(unittest.TestCase):
             assess_risk({})
 
     def test_flask_displays_risk_assessment(self):
+        import tempfile
+        from pathlib import Path
         from app import create_app
 
-        response = create_app().test_client().post(
-            "/",
-            data={
-                "username": "student_01",
-                "search_query": "security",
-                "comment": '<img src="javascript:demo" onerror="run()">',
-            },
-        )
+        with tempfile.TemporaryDirectory() as directory:
+            database_path = Path(directory) / "risk.sqlite3"
+            app = create_app(
+                {
+                    "TESTING": True,
+                    "DATABASE_PATH": str(database_path),
+                }
+            )
+            response = app.test_client().post(
+                "/",
+                data={
+                    "username": "student_01",
+                    "search_query": "security",
+                    "comment": '<img src="javascript:demo" onerror="run()">',
+                },
+            )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(b"RISK ASSESSMENT", response.data)
-        self.assertIn(b"RISK SCORE", response.data)
-        self.assertIn(b"Risk assessment reasons", response.data)
-        self.assertIn(b"HYBRID SIGNAL", response.data)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b"RISK ASSESSMENT", response.data)
+            self.assertIn(b"RISK SCORE", response.data)
+            self.assertIn(b"Risk assessment reasons", response.data)
+            self.assertIn(b"HYBRID SIGNAL", response.data)
 
 
 if __name__ == "__main__":

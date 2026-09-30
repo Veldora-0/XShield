@@ -1,16 +1,20 @@
-{% extends "base.html" %}
+{% extends "base_console.html" %}
 
-{% block title %}XShield | Event Not Found{% endblock %}
+{% block title %}XShield Console &middot; Event Not Found{% endblock %}
+{% block console_title %}Security Event Not Found{% endblock %}
 
 {% block content %}
-<section class="workspace-section">
-    <div class="container">
-        <div class="result-card">
-            <p class="eyebrow">SECURITY EVENT</p>
-            <h1>Event not found</h1>
-            <p class="empty-state">No security event exists for ID {{ event_id }}.</p>
-            <a class="text-link" href="{{ url_for('main.dashboard') }}">Back to dashboard</a>
+<div class="container event-not-found-page">
+    <div class="soc-card result-card not-found-card">
+        <div class="soc-eyebrow">
+            <span class="eyebrow-dot"></span>
+            <span>SECURITY EVENT</span>
+        </div>
+        <h1>Event not found</h1>
+        <p class="empty-state">No security event exists for ID {{ event_id }}.</p>
+        <div class="not-found-action">
+            <a class="text-link" href="{{ url_for('main.dashboard') }}">&larr; Back to dashboard</a>
         </div>
     </div>
-</section>
+</div>
 {% endblock %}

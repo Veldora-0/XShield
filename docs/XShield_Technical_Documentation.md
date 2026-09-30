@@ -203,14 +203,11 @@ If analysis fails, the API returns a controlled error and does not persist an
 event that appears safe. Database failures return a separate controlled error.
 There is no background queue or second detector/model in this phase.
 
-## Dashboard
+## Security Operations Console
 
-The dashboard is available at `/dashboard`, with event details at
-`/dashboard/event/<id>`. It shows totals, risk counts, blocked counts, a risk
-distribution, recent events, filters, search, and escaped event details.
-Both routes require HTTP Basic Authentication configured through
-`XSHIELD_DASHBOARD_USERNAME` and `XSHIELD_DASHBOARD_PASSWORD`. Missing
-password configuration returns 503 rather than exposing events.
+The Security Operations Console is available at `/dashboard`, with specialized views for `/dashboard/events`, `/dashboard/incidents`, `/dashboard/behavior`, `/dashboard/applications`, and event details at `/dashboard/event/<id>`. It presents telemetry totals, risk counts, blocked counts, risk distributions, recent events, filters, search, behavioral indicators, correlated incidents, and escaped event payloads.
+
+In this local demonstration mode, the console is unauthenticated to facilitate immediate examination of security operations. XShield console is unauthenticated in local demonstration mode. API ingestion remains authenticated using X-API-Key.
 
 ## Security Controls
 
@@ -218,7 +215,7 @@ The application includes server-side validation, field limits, a 16 KiB
 request limit, Jinja autoescaping, no unsafe DOM HTML sinks, parameterized
 SQLite access, fixed-path model loading, controlled model/database errors,
 default-disabled debug mode, CSP, `nosniff`, `X-Frame-Options`,
-`Referrer-Policy`, and dashboard authentication.
+`Referrer-Policy`, and cryptographically hashed `X-API-Key` ingestion authentication.
 
 The Phase 14 review is recorded in `reports/security_review.md`. HTTPS,
 production identity management, credential rotation, dependency locking,

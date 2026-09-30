@@ -1,0 +1,195 @@
+{% extends "base_product.html" %}
+
+{% block title %}XShield &middot; Application-Aware XSS Security Intelligence{% endblock %}
+
+{% block content %}
+<div class="product-home">
+    <!-- Hero Section -->
+    <section class="product-hero">
+        <div class="product-container">
+            <div class="hero-badge">
+                <span class="pulse-dot"></span>
+                <span>AI/ML DEFENSIVE PLATFORM &middot; VERSION 1.0</span>
+            </div>
+            <h1 class="hero-title">Application-aware XSS security intelligence</h1>
+            <p class="hero-subtitle">
+                A unified defensive system that combines explainable heuristic rules with character-level machine learning, real-time risk assessment, behavioral intelligence, and incident correlation.
+            </p>
+            <div class="hero-actions">
+                <a href="{{ url_for('main.scanner') }}" class="btn-primary-hero">
+                    <span>Launch Scanner</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </a>
+                <a href="{{ url_for('main.how_it_works') }}" class="btn-secondary-hero">
+                    <span>How It Works</span>
+                </a>
+                <a href="{{ url_for('main.demo_app') }}" class="btn-demo-hero">
+                    <span>Try Demo Application &rarr;</span>
+                </a>
+            </div>
+
+            <!-- Security Principle Banner (Guarantees test compatibility) -->
+            <div class="product-security-callout">
+                <div class="callout-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                </div>
+                <div class="callout-content">
+                    <strong>User input is treated as untrusted data.</strong>
+                    <span>Values are validated on the server, bounded to safe lengths, escaped when displayed, and never executed by the detection pipeline.</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Simulated Live Security Telemetry Stream -->
+    <section class="telemetry-stream-section">
+        <div class="product-container">
+            <div class="telemetry-card">
+                <div class="telemetry-card-header">
+                    <div class="telemetry-title-wrap">
+                        <span class="pulse-dot-sm"></span>
+                        <span class="telemetry-title">SIMULATED SECURITY STREAM</span>
+                    </div>
+                    <span class="telemetry-disclaimer">Simulated demonstration telemetry &middot; Offline evaluation stream &middot; No live network exposure</span>
+                </div>
+
+                <div class="telemetry-stream-body" id="simulated-stream">
+                    <!-- Stream Items rotating dynamically -->
+                    <div class="stream-row stream-critical">
+                        <span class="stream-time">09:52:14.802</span>
+                        <span class="stream-endpoint">POST /api/v1/events</span>
+                        <code class="stream-payload">&lt;script&gt;alert(document.cookie)&lt;/script&gt;</code>
+                        <span class="stream-badge badge-critical">CRITICAL (Risk 95)</span>
+                        <span class="stream-action">BLOCK</span>
+                    </div>
+                    <div class="stream-row stream-low">
+                        <span class="stream-time">09:52:12.110</span>
+                        <span class="stream-endpoint">GET /search?q=compliance</span>
+                        <code class="stream-payload">quarterly compliance guidelines 2026</code>
+                        <span class="stream-badge badge-low">LOW (Risk 10)</span>
+                        <span class="stream-action">ALLOW</span>
+                    </div>
+                    <div class="stream-row stream-high">
+                        <span class="stream-time">09:51:58.420</span>
+                        <span class="stream-endpoint">POST /profile/comment</span>
+                        <code class="stream-payload">&lt;img src=x onerror=prompt(1)&gt;</code>
+                        <span class="stream-badge badge-high">HIGH (Risk 72)</span>
+                        <span class="stream-action">BLOCK</span>
+                    </div>
+                    <div class="stream-row stream-medium">
+                        <span class="stream-time">09:51:44.200</span>
+                        <span class="stream-endpoint">GET /items?ref=javascript:test()</span>
+                        <code class="stream-payload">javascript:void(0)</code>
+                        <span class="stream-badge badge-medium">MEDIUM (Risk 45)</span>
+                        <span class="stream-action">FLAG</span>
+                    </div>
+                </div>
+
+                <div class="telemetry-footer-bar">
+                    <span class="telemetry-stat"><span>Detection Latency:</span> <strong>0.75ms avg</strong></span>
+                    <span class="telemetry-stat"><span>Classifiers:</span> <strong>Rule Engine (6 rules) + Logistic Regression</strong></span>
+                    <span class="telemetry-stat"><span>Mode:</span> <strong>Multi-Tenant Ingestion</strong></span>
+                    <a href="{{ url_for('main.dashboard') }}" class="telemetry-link">Open Security Console &rarr;</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3 Core Architecture Pillars -->
+    <section class="pillars-section">
+        <div class="product-container">
+            <div class="section-title-wrap">
+                <span class="section-eyebrow">CORE ARCHITECTURE</span>
+                <h2 class="section-heading">Multi-Stage Explainable Defense</h2>
+                <p class="section-subheading">XShield unites deterministic indicator rules with sequence learning and temporal incident correlation.</p>
+            </div>
+
+            <div class="pillars-grid">
+                <div class="pillar-card">
+                    <div class="pillar-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+                    </div>
+                    <h3>1. Heuristic Rule Detector</h3>
+                    <p>Six explainable indicator categories analyze bounded, case-folded input using single-layer decoding to identify markup, script execution functions, and event handlers without execution.</p>
+                    <ul class="pillar-features">
+                        <li>R001–R006 Active Rules</li>
+                        <li>Single-layer entity decoding</li>
+                        <li>Zero payload execution</li>
+                    </ul>
+                </div>
+
+                <div class="pillar-card">
+                    <div class="pillar-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                    </div>
+                    <h3>2. Character-Level ML Model</h3>
+                    <p>Sub-token character n-grams (3 to 5 characters) capture recurring syntax fragments, delimiters, and obfuscated sequences paired with a balanced linear classifier.</p>
+                    <ul class="pillar-features">
+                        <li>54,919 character n-gram features</li>
+                        <li>Calibrated XSS probability</li>
+                        <li>99.90% held-out test accuracy</li>
+                    </ul>
+                </div>
+
+                <div class="pillar-card">
+                    <div class="pillar-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    </div>
+                    <h3>3. Behavioral &amp; Incidents</h3>
+                    <p>Phase 6 behavioral intelligence tracks burst velocity and repeated endpoint probes, while Phase 7 correlation clusters related multi-event incidents dynamically.</p>
+                    <ul class="pillar-features">
+                        <li>Deterministic incident IDs</li>
+                        <li>Burst &amp; pattern diversity heuristics</li>
+                        <li>Application-isolated event history</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Feature Showcase -->
+    <section class="showcase-section">
+        <div class="product-container showcase-grid">
+            <div class="showcase-copy">
+                <span class="section-eyebrow">DEVELOPER &amp; INTEGRATION READY</span>
+                <h2>Deploy as an Ingestion API or Web Gateway</h2>
+                <p>
+                    XShield features an ingestion API endpoint (<code>POST /api/v1/events</code>) secured by one-way SHA-256 hashed API keys. Client applications submit structured observations with flexible data retention policies: full, truncated, hash-only, redacted, or disabled.
+                </p>
+                <div class="showcase-links">
+                    <a href="{{ url_for('main.api_docs') }}" class="text-link">Explore the Integration API &rarr;</a>
+                    <a href="{{ url_for('main.benchmark') }}" class="text-link">View Held-Out Evaluation Benchmarks &rarr;</a>
+                </div>
+            </div>
+
+            <div class="showcase-code-card">
+                <div class="code-card-header">
+                    <span>Sample Ingestion Request</span>
+                    <code>POST /api/v1/events</code>
+                </div>
+                <pre class="code-box"><code>{
+  "event_type": "request_observation",
+  "endpoint": "/search",
+  "http_method": "POST",
+  "input_fields": {
+    "query": "&lt;script&gt;alert(1)&lt;/script&gt;"
+  },
+  "retention_mode": "truncated"
+}</code></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bottom CTA Bar -->
+    <section class="cta-section">
+        <div class="product-container cta-card">
+            <h2>Experience XShield Live</h2>
+            <p>Test real payloads in the Interactive Scanner or simulate application traffic through the Demo App.</p>
+            <div class="cta-btn-group">
+                <a href="{{ url_for('main.scanner') }}" class="btn-primary-hero">Launch Interactive Scanner</a>
+                <a href="{{ url_for('main.demo_app') }}" class="btn-secondary-hero">Launch Controlled Demo</a>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

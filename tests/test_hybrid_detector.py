@@ -95,25 +95,36 @@ class HybridDetectorTests(unittest.TestCase):
         self.assertIn("ml_result", result)
 
     def test_flask_displays_rule_ml_and_hybrid_sections(self):
-        client = create_app().test_client()
-        response = client.post(
-            "/",
-            data={
-                "username": "student_01",
-                "search_query": "security",
-                "comment": '<img src="javascript:demo" onerror="run()">',
-            },
-        )
+        import tempfile
+        from pathlib import Path
 
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(b"RULE DETECTOR", response.data)
-        self.assertIn(b"ML DETECTOR", response.data)
-        self.assertIn(b"HYBRID SIGNAL", response.data)
-        self.assertIn(b"AGREEMENT", response.data)
-        self.assertIn(b"RESPONSE ACTION", response.data)
-        self.assertIn(b"rejected it", response.data)
-        self.assertNotIn(b"&lt;img", response.data)
-        self.assertNotIn(b"<img src=", response.data)
+        with tempfile.TemporaryDirectory() as directory:
+            database_path = Path(directory) / "hybrid.sqlite3"
+            app = create_app(
+                {
+                    "TESTING": True,
+                    "DATABASE_PATH": str(database_path),
+                }
+            )
+            client = app.test_client()
+            response = client.post(
+                "/",
+                data={
+                    "username": "student_01",
+                    "search_query": "security",
+                    "comment": '<img src="javascript:demo" onerror="run()">',
+                },
+            )
+
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b"RULE DETECTOR", response.data)
+            self.assertIn(b"ML DETECTOR", response.data)
+            self.assertIn(b"HYBRID SIGNAL", response.data)
+            self.assertIn(b"AGREEMENT", response.data)
+            self.assertIn(b"RESPONSE ACTION", response.data)
+            self.assertIn(b"rejected it", response.data)
+            self.assertNotIn(b"&lt;img", response.data)
+            self.assertNotIn(b"<img src=", response.data)
 
 
 if __name__ == "__main__":

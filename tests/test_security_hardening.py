@@ -10,16 +10,24 @@ from app.services.security_logger import log_security_event
 
 class SecurityHardeningTests(unittest.TestCase):
     def test_oversized_request_is_rejected(self):
-        app = create_app({"TESTING": True, "MAX_CONTENT_LENGTH": 256})
-        response = app.test_client().post(
-            "/",
-            data={
-                "username": "student_01",
-                "search_query": "security",
-                "comment": "x" * 1000,
-            },
-        )
-        self.assertEqual(response.status_code, 413)
+        with tempfile.TemporaryDirectory() as directory:
+            database_path = Path(directory) / "hardening.sqlite3"
+            app = create_app(
+                {
+                    "TESTING": True,
+                    "DATABASE_PATH": str(database_path),
+                    "MAX_CONTENT_LENGTH": 256,
+                }
+            )
+            response = app.test_client().post(
+                "/",
+                data={
+                    "username": "student_01",
+                    "search_query": "security",
+                    "comment": "x" * 1000,
+                },
+            )
+            self.assertEqual(response.status_code, 413)
 
     def test_logging_failure_does_not_expose_exception_details(self):
         with tempfile.TemporaryDirectory() as directory:

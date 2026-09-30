@@ -1,0 +1,83 @@
+{% extends "base_console.html" %}
+
+{% block title %}XShield Console &middot; Registered Applications{% endblock %}
+{% block console_title %}Application Registry &amp; Integration Credentials{% endblock %}
+
+{% block content %}
+<div class="dashboard-page">
+    <section class="soc-hero">
+        <div class="soc-hero-content">
+            <div class="soc-hero-title-area">
+                <div class="soc-eyebrow">
+                    <span class="eyebrow-dot"></span>
+                    <span>MULTI-TENANT REGISTRY</span>
+                </div>
+                <h1 class="soc-headline">Registered Applications</h1>
+                <p class="soc-subheadline">
+                    Multi-tenant client applications authenticated via one-way hashed API credentials. Events ingested are isolated and attributed to their registered application ID.
+                </p>
+            </div>
+            <div class="panel-meta-chip">
+                <span>{{ applications|length }} Applications Registered</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="soc-card soc-panel">
+        <div class="panel-heading">
+            <h2>Active Applications</h2>
+            <span class="panel-meta">Managed via scripts/manage_applications.py</span>
+        </div>
+
+        {% if applications %}
+        <div class="table-wrapper">
+            <table class="soc-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Application Name</th>
+                        <th>Slug</th>
+                        <th>Status</th>
+                        <th>Registered Date</th>
+                        <th>Active API Keys</th>
+                        <th>Total Keys</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for app in applications %}
+                    <tr class="soc-table-row">
+                        <td><strong>#{{ app.id }}</strong></td>
+                        <td>
+                            <div class="app-name-wrap">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"></rect><rect x="2" y="14" width="20" height="8" rx="2"></rect></svg>
+                                <strong>{{ app.name }}</strong>
+                            </div>
+                        </td>
+                        <td><code>{{ app.slug }}</code></td>
+                        <td>
+                            <span class="badge {% if app.status == 'active' %}action-badge action-allow{% else %}risk-badge risk-critical{% endif %}">
+                                <span class="badge-dot"></span>
+                                {{ app.status }}
+                            </span>
+                        </td>
+                        <td><span class="mono-time">{{ app.created_at }}</span></td>
+                        <td><strong>{{ app.active_api_key_count }} active</strong></td>
+                        <td><span class="mono-sub">{{ app.api_key_count }} total</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="soc-empty-box">
+            <p class="empty-state">No applications registered.</p>
+        </div>
+        {% endif %}
+
+        <div class="app-security-banner" style="margin-top: 20px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <span>Credential Integrity: Integration API keys are cryptographically generated and stored exclusively as one-way SHA-256 hashes. Plaintext keys cannot be retrieved or exposed from the database.</span>
+        </div>
+    </section>
+</div>
+{% endblock %}

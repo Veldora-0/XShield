@@ -1,0 +1,190 @@
+{% extends "base_product.html" %}
+
+{% block title %}XShield &middot; Active Heuristic Rule Catalog{% endblock %}
+
+{% block content %}
+<div class="product-page rules-page">
+    <section class="page-hero">
+        <div class="product-container">
+            <span class="section-eyebrow">DETERMINISTIC DEFENSE</span>
+            <h1 class="page-title">Active Rule Catalog</h1>
+            <p class="page-lead">
+                XShield's explainable heuristic detector executes six independent indicator rules. Each rule targets a specific structural syntax associated with Cross-Site Scripting.
+            </p>
+        </div>
+    </section>
+
+    <!-- Rule Specifications & Limits -->
+    <section class="rules-limits-section">
+        <div class="product-container">
+            <div class="rules-limits-grid">
+                <div class="limit-card">
+                    <span class="limit-label">INPUT BOUND</span>
+                    <strong>10,000 Chars Max</strong>
+                    <small>Analysis truncates beyond 10k to prevent regex DoS</small>
+                </div>
+                <div class="limit-card">
+                    <span class="limit-label">NORMALIZATION</span>
+                    <strong>Single-Layer Decode</strong>
+                    <small>One layer of URL &amp; HTML entity unescaping</small>
+                </div>
+                <div class="limit-card">
+                    <span class="limit-label">EXECUTION POLICY</span>
+                    <strong>Zero Execution</strong>
+                    <small>Treated as inert offline data; never evaluated in DOM</small>
+                </div>
+                <div class="limit-card">
+                    <span class="limit-label">RULE SCORE CAP</span>
+                    <strong>100 Points</strong>
+                    <small>Sum of matched weights capped at 100 for normalization</small>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Rules Grid / Table -->
+    <section class="rules-catalog-section">
+        <div class="product-container">
+            <div class="rules-list-grid">
+                <!-- R001 -->
+                <div class="soc-card rule-catalog-card">
+                    <div class="rule-card-header">
+                        <div class="rule-id-wrap">
+                            <span class="rule-badge">RULE</span>
+                            <code class="rule-code">R001</code>
+                        </div>
+                        <span class="rule-weight-badge">+12 Weight</span>
+                    </div>
+                    <h3 class="rule-title">Unexpected HTML Markup</h3>
+                    <p class="rule-desc">Detects opening and closing HTML-like tag constructs inside parameter values that are normally expected to be plain text.</p>
+                    <div class="rule-meta-box">
+                        <span class="meta-label">Detection Signature:</span>
+                        <code class="meta-pattern">&lt;\s*/?\s*[a-z][^&gt;]*&gt;</code>
+                    </div>
+                    <div class="rule-footer-status">
+                        <span class="status-active"><span class="status-dot-sm"></span> Status: Active</span>
+                        <span class="rule-field-scope">Applies to all input fields</span>
+                    </div>
+                </div>
+
+                <!-- R002 -->
+                <div class="soc-card rule-catalog-card">
+                    <div class="rule-card-header">
+                        <div class="rule-id-wrap">
+                            <span class="rule-badge">RULE</span>
+                            <code class="rule-code">R002</code>
+                        </div>
+                        <span class="rule-weight-badge weight-high">+30 Weight</span>
+                    </div>
+                    <h3 class="rule-title">Script-Related Constructs</h3>
+                    <p class="rule-desc">Detects <code>&lt;script&gt;</code> tags and common JavaScript execution functions including <code>eval()</code>, <code>setTimeout()</code>, and <code>setInterval()</code>.</p>
+                    <div class="rule-meta-box">
+                        <span class="meta-label">Detection Signature:</span>
+                        <code class="meta-pattern">&lt;\s*script\b|eval\s*\(|setTimeout\s*\(</code>
+                    </div>
+                    <div class="rule-footer-status">
+                        <span class="status-active"><span class="status-dot-sm"></span> Status: Active</span>
+                        <span class="rule-field-scope">Primary high-severity indicator</span>
+                    </div>
+                </div>
+
+                <!-- R003 -->
+                <div class="soc-card rule-catalog-card">
+                    <div class="rule-card-header">
+                        <div class="rule-id-wrap">
+                            <span class="rule-badge">RULE</span>
+                            <code class="rule-code">R003</code>
+                        </div>
+                        <span class="rule-weight-badge weight-med">+25 Weight</span>
+                    </div>
+                    <h3 class="rule-title">Event-Handler Attributes</h3>
+                    <p class="rule-desc">Detects inline DOM event handlers (e.g. <code>onload=</code>, <code>onerror=</code>, <code>onclick=</code>, <code>onmouseover=</code>) commonly embedded in media tags.</p>
+                    <div class="rule-meta-box">
+                        <span class="meta-label">Detection Signature:</span>
+                        <code class="meta-pattern">\bon[a-z][a-z0-9_-]*\s*=</code>
+                    </div>
+                    <div class="rule-footer-status">
+                        <span class="status-active"><span class="status-dot-sm"></span> Status: Active</span>
+                        <span class="rule-field-scope">Applies to HTML attributes</span>
+                    </div>
+                </div>
+
+                <!-- R004 -->
+                <div class="soc-card rule-catalog-card">
+                    <div class="rule-card-header">
+                        <div class="rule-id-wrap">
+                            <span class="rule-badge">RULE</span>
+                            <code class="rule-code">R004</code>
+                        </div>
+                        <span class="rule-weight-badge weight-med">+25 Weight</span>
+                    </div>
+                    <h3 class="rule-title">Suspicious URL Schemes</h3>
+                    <p class="rule-desc">Detects protocol schemes commonly capable of executing client-side scripts inside navigation links or iframe sources.</p>
+                    <div class="rule-meta-box">
+                        <span class="meta-label">Detection Signature:</span>
+                        <code class="meta-pattern">\b(?:javascript|vbscript|data)\s*:</code>
+                    </div>
+                    <div class="rule-footer-status">
+                        <span class="status-active"><span class="status-dot-sm"></span> Status: Active</span>
+                        <span class="rule-field-scope">Applies to URIs &amp; link references</span>
+                    </div>
+                </div>
+
+                <!-- R005 -->
+                <div class="soc-card rule-catalog-card">
+                    <div class="rule-card-header">
+                        <div class="rule-id-wrap">
+                            <span class="rule-badge">RULE</span>
+                            <code class="rule-code">R005</code>
+                        </div>
+                        <span class="rule-weight-badge">+15 Weight</span>
+                    </div>
+                    <h3 class="rule-title">Encoded Suspicious Constructs</h3>
+                    <p class="rule-desc">Detects hex, entity, or URL-encoded character markers (e.g. <code>%3c</code>, <code>&amp;#x3c;</code>) that unescape into executable HTML or script sequences.</p>
+                    <div class="rule-meta-box">
+                        <span class="meta-label">Detection Signature:</span>
+                        <code class="meta-pattern">(?:%3c|%3e|&amp;#x?[0-9a-f]+;) =&gt; decoded syntax</code>
+                    </div>
+                    <div class="rule-footer-status">
+                        <span class="status-active"><span class="status-dot-sm"></span> Status: Active</span>
+                        <span class="rule-field-scope">Obfuscation &amp; evasion analysis</span>
+                    </div>
+                </div>
+
+                <!-- R006 -->
+                <div class="soc-card rule-catalog-card">
+                    <div class="rule-card-header">
+                        <div class="rule-id-wrap">
+                            <span class="rule-badge">RULE</span>
+                            <code class="rule-code">R006</code>
+                        </div>
+                        <span class="rule-weight-badge">+15 Weight</span>
+                    </div>
+                    <h3 class="rule-title">Compound Indicator Trigger</h3>
+                    <p class="rule-desc">Contextual multiplier rule. Triggers additional weight when two or more independent base indicators (R001–R005) match simultaneously.</p>
+                    <div class="rule-meta-box">
+                        <span class="meta-label">Detection Condition:</span>
+                        <code class="meta-pattern">len(matched_base_rules) &gt;= 2</code>
+                    </div>
+                    <div class="rule-footer-status">
+                        <span class="status-active"><span class="status-dot-sm"></span> Status: Active</span>
+                        <span class="rule-field-scope">Compound risk correlation</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bottom CTA -->
+    <section class="cta-section">
+        <div class="product-container cta-card">
+            <h2>Test Rule Triggers Live</h2>
+            <p>See which rules fire when submitting sample scripts or event handlers in our interactive scanner.</p>
+            <div class="cta-btn-group">
+                <a href="{{ url_for('main.scanner') }}" class="btn-primary-hero">Test in Scanner</a>
+                <a href="{{ url_for('main.benchmark') }}" class="btn-secondary-hero">Review Evaluation</a>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

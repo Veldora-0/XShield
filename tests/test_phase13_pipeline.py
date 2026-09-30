@@ -1,6 +1,5 @@
 import tempfile
 import unittest
-from base64 import b64encode
 from pathlib import Path
 
 from app import create_app
@@ -15,8 +14,6 @@ class Phase13PipelineTests(unittest.TestCase):
                 {
                     "TESTING": True,
                     "DATABASE_PATH": str(database_path),
-                    "DASHBOARD_USERNAME": "test-admin",
-                    "DASHBOARD_PASSWORD": "test-password",
                 }
             )
             client = app.test_client()
@@ -31,11 +28,7 @@ class Phase13PipelineTests(unittest.TestCase):
 
             self.assertEqual(response.status_code, 200)
             self.assertEqual(count_events(database_path), 1)
-            credentials = b64encode(b"test-admin:test-password").decode("ascii")
-            dashboard = client.get(
-                "/dashboard",
-                headers={"Authorization": f"Basic {credentials}"},
-            )
+            dashboard = client.get("/dashboard")
             self.assertEqual(dashboard.status_code, 200)
             self.assertIn(b"CRITICAL", dashboard.data)
             self.assertIn(b"block_and_alert", dashboard.data)

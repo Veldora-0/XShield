@@ -1,0 +1,432 @@
+{% extends "base_product.html" %}
+
+{% block title %}XShield &middot; Interactive Payload Scanner{% endblock %}
+
+{% block content %}
+<div class="product-page scanner-page">
+    <section class="page-hero">
+        <div class="product-container">
+            <span class="section-eyebrow">LIVE PAYLOAD INSPECTION</span>
+            <h1 class="page-title">Interactive Payload Scanner</h1>
+            <p class="page-lead">
+                Submit arbitrary text or payloads to execute XShield's real-time heuristic rule engine and character-level machine learning model.
+            </p>
+        </div>
+    </section>
+
+    <!-- Scanner Editor Section -->
+    <section class="scanner-editor-section">
+        <div class="product-container">
+            <div class="scanner-editor-grid">
+                <!-- Left: Form Editor -->
+                <div class="soc-card form-card">
+                    <div class="security-notice">
+                        <div class="notice-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        </div>
+                        <div class="notice-text">
+                            <strong>User input is treated as untrusted data.</strong>
+                            <span>Values are validated on the server, safely escaped, and evaluated without execution.</span>
+                        </div>
+                    </div>
+
+                    <!-- Preset Selector -->
+                    <div class="payload-presets-card">
+                        <div class="presets-header">
+                            <div class="presets-title">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+                                <span>Controlled Demo Presets</span>
+                            </div>
+                            <span class="preset-help-text" id="preset-active-label">Select a preset to load safe test vectors</span>
+                        </div>
+                        <div class="preset-buttons">
+                            <button type="button" class="btn-preset" data-preset="benign">Benign Search</button>
+                            <button type="button" class="btn-preset" data-preset="script">Script Tag (R002)</button>
+                            <button type="button" class="btn-preset" data-preset="event">Event Handler (R003)</button>
+                            <button type="button" class="btn-preset" data-preset="scheme">Script URL (R004)</button>
+                        </div>
+                    </div>
+
+                    <form method="post" action="{{ url_for('main.scanner') }}" id="analysis-form">
+                        <div class="form-group">
+                            <label for="username">
+                                <span>Username</span>
+                                <span class="field-limit">Max 100 chars &middot; alphanumeric + hyphen</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="username"
+                                name="username"
+                                placeholder="Enter username (e.g. security_auditor)"
+                                required
+                                maxlength="100"
+                                value="{{ form_values.username }}"
+                                autocomplete="off"
+                            >
+                            {% if errors.username %}
+                            <p class="field-error">{{ errors.username }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="search_query">
+                                <span>Search Query</span>
+                                <span class="field-limit">Max 200 chars</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="search_query"
+                                name="search_query"
+                                placeholder="Enter search parameter to test"
+                                required
+                                maxlength="200"
+                                value="{{ form_values.search_query }}"
+                                autocomplete="off"
+                            >
+                            {% if errors.search_query %}
+                            <p class="field-error">{{ errors.search_query }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="comment">
+                                <span>Comment / Payload</span>
+                                <span class="field-limit" id="comment-counter">Max 1,000 chars</span>
+                            </label>
+                            <textarea
+                                id="comment"
+                                name="comment"
+                                rows="6"
+                                placeholder="Enter message or script payload for inspection..."
+                                required
+                                maxlength="1000"
+                            >{{ form_values.comment }}</textarea>
+                            {% if errors.comment %}
+                            <p class="field-error">{{ errors.comment }}</p>
+                            {% endif %}
+                        </div>
+
+                        <p class="form-note">
+                            Validation checks format and length. It is not XSS detection or a replacement for output encoding.
+                        </p>
+
+                        <div class="form-actions-group">
+                            <button type="submit" class="primary-button" id="submit-scanner-btn">
+                                <span>Analyze Input</span>
+                                <span aria-hidden="true">&rarr;</span>
+                            </button>
+                            <button type="button" class="btn-secondary" id="clear-scanner-btn">
+                                <span>Clear Fields</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Right: Information & Guidance Panel -->
+                <div class="soc-card scanner-info-card">
+                    <div class="info-header">
+                        <span class="mini-label">SCANNER GUIDANCE</span>
+                        <h3>Multi-Engine Analysis</h3>
+                    </div>
+                    <p class="info-desc">
+                        Submitting text invokes the synchronous <code>analyze_security_input</code> pipeline, identical to production event observation:
+                    </p>
+
+                    <div class="info-step-list">
+                        <div class="info-step-item">
+                            <span class="step-badge">1</span>
+                            <div>
+                                <strong>Independent Heuristic Rules</strong>
+                                <p>R001–R006 check for unescaped markup, execution constructs, event handlers, and obfuscated URLs.</p>
+                            </div>
+                        </div>
+                        <div class="info-step-item">
+                            <span class="step-badge">2</span>
+                            <div>
+                                <strong>Character N-Gram ML Evaluation</strong>
+                                <p>Evaluated against 54,919 TF-IDF features to calculate a calibrated XSS probability.</p>
+                            </div>
+                        </div>
+                        <div class="info-step-item">
+                            <span class="step-badge">3</span>
+                            <div>
+                                <strong>Risk Engine &amp; Fail-Closed Response</strong>
+                                <p>The continuous hybrid signal is scored (0–100) and assigned a defensive action (allow, flag, or block).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="scanner-privacy-box">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        <span>Offline Execution Guarantee: Payloads are never executed in the browser or sent to any external server.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4 Diagnostic Sections Result Card -->
+    {% if detection_result %}
+    <section class="scanner-results-section" id="results">
+        <div class="product-container">
+            <div class="soc-card result-card risk-border-{{ detection_result.risk_result.risk_level|lower }}">
+                <div class="result-header">
+                    <div>
+                        <div class="soc-eyebrow">
+                            <span class="eyebrow-dot"></span>
+                            <span>RULE-BASED ANALYSIS</span>
+                        </div>
+                        <h2>Input received and analyzed</h2>
+                    </div>
+                    <div class="header-badges">
+                        <span class="received-badge">Received</span>
+                        <span class="badge risk-badge risk-{{ detection_result.risk_result.risk_level|lower }}">
+                            <span class="badge-dot"></span>
+                            {{ detection_result.risk_result.risk_level }} Risk
+                        </span>
+                    </div>
+                </div>
+
+                <p class="result-description">
+                    Flask received the submitted values. They are displayed as escaped text and analyzed by independent rule and ML detectors. This result is an indicator, not a final risk decision.
+                </p>
+
+                <!-- 4 Clear Diagnostic Sections -->
+                <div class="diagnostic-sections-grid">
+                    <!-- Diagnostic 1: Rule Detector -->
+                    <div class="diagnostic-box">
+                        <div class="detection-summary">
+                            <div>
+                                <span class="summary-label">RULE DETECTOR</span>
+                                <strong>
+                                    {% if detection_result.rule_result.is_suspicious %}
+                                    Suspicious characteristics detected
+                                    {% else %}
+                                    No suspicious characteristics detected
+                                    {% endif %}
+                                </strong>
+                            </div>
+                            <div class="score-display">
+                                <span class="summary-label">RULE SCORE</span>
+                                <strong class="score-accent">{{ detection_result.rule_result.score }} / 100</strong>
+                            </div>
+                        </div>
+
+                        {% if detection_result.rule_result.rule_details %}
+                        <div class="matched-rules">
+                            <h3>Rule detector details</h3>
+                            <div class="rule-items-list">
+                                {% for rule in detection_result.rule_result.rule_details %}
+                                <div class="rule-item">
+                                    <div class="rule-item-content">
+                                        <div class="rule-item-title">
+                                            <code>{{ rule.rule_id }}</code> &middot; <strong>{{ rule.name }}</strong>
+                                        </div>
+                                        <div class="rule-item-sub">
+                                            <span>{{ rule.field }} field</span> &middot; <span>{{ rule.reason }}</span>
+                                        </div>
+                                    </div>
+                                    <span class="rule-weight">+{{ rule.weight }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% else %}
+                        <p class="no-rules">No rule indicators matched this submission.</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Diagnostic 2: ML Detector -->
+                    <div class="diagnostic-box">
+                        <div class="detection-summary">
+                            <div>
+                                <span class="summary-label">ML DETECTOR</span>
+                                <strong class="pred-label pred-{{ detection_result.ml_result.prediction }}">
+                                    {{ detection_result.ml_result.prediction|capitalize }}
+                                </strong>
+                            </div>
+                            <div class="score-display">
+                                <span class="summary-label">XSS PROBABILITY</span>
+                                <strong class="score-accent">{{ "%.4f"|format(detection_result.ml_result.probability) }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="probability-meter-box">
+                            <div class="prob-labels">
+                                <span>Model Confidence</span>
+                                <span>{{ "%.2f"|format(detection_result.ml_result.probability * 100) }}%</span>
+                            </div>
+                            <div class="prob-track">
+                                <div class="prob-fill {% if detection_result.ml_result.probability >= 0.5 %}prob-high{% else %}prob-low{% endif %}" style="width: {{ [detection_result.ml_result.probability * 100, 100]|min }}%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Diagnostic 3: Hybrid Signal -->
+                    <div class="diagnostic-box">
+                        <div class="detection-summary">
+                            <div>
+                                <span class="summary-label">HYBRID SIGNAL</span>
+                                <strong class="score-accent">{{ "%.4f"|format(detection_result.hybrid.hybrid_signal) }}</strong>
+                            </div>
+                            <div class="score-display">
+                                <span class="summary-label">AGREEMENT</span>
+                                <strong>{{ detection_result.hybrid.agreement }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="matched-rules">
+                            <h3>Hybrid detector details</h3>
+                            <div class="rule-item">
+                                <div>
+                                    <strong>Rule contribution</strong>
+                                    <span class="table-subtext">
+                                        Normalized score {{ "%.4f"|format(detection_result.hybrid.rule_score_normalized) }}
+                                        &times; weight {{ "%.2f"|format(detection_result.hybrid.rule_weight) }}
+                                    </span>
+                                </div>
+                                <span class="rule-weight">{{ "%.4f"|format(detection_result.hybrid.rule_contribution) }}</span>
+                            </div>
+                            <div class="rule-item">
+                                <div>
+                                    <strong>ML contribution</strong>
+                                    <span class="table-subtext">
+                                        XSS probability {{ "%.4f"|format(detection_result.hybrid.ml_score) }}
+                                        &times; weight {{ "%.2f"|format(detection_result.hybrid.ml_weight) }}
+                                    </span>
+                                </div>
+                                <span class="rule-weight">{{ "%.4f"|format(detection_result.hybrid.ml_contribution) }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Diagnostic 4: Risk & Action -->
+                    <div class="diagnostic-box">
+                        <div class="detection-summary">
+                            <div>
+                                <span class="summary-label">RISK ASSESSMENT</span>
+                                <strong class="risk-label risk-{{ detection_result.risk_result.risk_level|lower }}">{{ detection_result.risk_result.risk_level }}</strong>
+                            </div>
+                            <div class="score-display">
+                                <span class="summary-label">RISK SCORE</span>
+                                <strong class="score-accent">{{ "%.2f"|format(detection_result.risk_result.risk_score) }} / 100</strong>
+                            </div>
+                        </div>
+
+                        <div class="matched-rules">
+                            <h3>Risk assessment reasons</h3>
+                            {% for reason in detection_result.risk_result.reasons %}
+                            <div class="rule-item">
+                                <div><span>{{ reason }}</span></div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="detection-summary">
+                            <div>
+                                <span class="summary-label">RESPONSE ACTION</span>
+                                <strong class="badge action-badge action-{{ detection_result.action_result.action|replace('_', '-') }}">{{ detection_result.action_result.action }}</strong>
+                            </div>
+                            <div class="score-display">
+                                <span class="summary-label">STATUS</span>
+                                <strong>
+                                    {% if detection_result.action_result.blocked %}
+                                    Rejected
+                                    {% else %}
+                                    Continued safely
+                                    {% endif %}
+                                </strong>
+                            </div>
+                        </div>
+
+                        <div class="matched-rules">
+                            <h3>Response decision</h3>
+                            <div class="rule-item">
+                                <div>
+                                    <strong>{{ detection_result.action_result.action_message }}</strong>
+                                    <span class="table-subtext">{{ detection_result.action_result.reason }}</span>
+                                </div>
+                            </div>
+                            {% if detection_result.action_result.alert_required %}
+                            <div class="rule-item">
+                                <div>
+                                    <strong>Future alert marker</strong>
+                                    <span class="table-subtext">No alert was sent in this phase.</span>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if detection_result.action_result.blocked %}
+                <div class="blocked-alert-box">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>
+                    <p class="no-rules">
+                        The submitted content is not displayed because the prototype
+                        response action rejected it. No firewall or external blocking
+                        was performed.
+                    </p>
+                </div>
+                {% endif %}
+
+                <!-- Logging Status -->
+                <div class="logging-card">
+                    <div class="matched-rules">
+                        <h3>Security event logging</h3>
+                        {% if detection_result.logging_result.stored %}
+                        <div class="rule-item logging-success">
+                            <div class="logging-row">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <div>
+                                    <strong>Event stored</strong>
+                                    <span class="table-subtext">
+                                        Security event ID {{ detection_result.logging_result.event_id }}
+                                        was stored with a UTC timestamp.
+                                    </span>
+                                </div>
+                            </div>
+                            <a href="{{ url_for('main.dashboard_event', event_id=detection_result.logging_result.event_id) }}" class="event-id-link">
+                                Inspect Event in Console &rarr;
+                            </a>
+                        </div>
+                        {% else %}
+                        <div class="rule-item logging-error">
+                            <div>
+                                <strong>Event was not stored</strong>
+                                <span class="table-subtext">{{ detection_result.logging_result.error }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Stored Input Inspection (when allowed) -->
+                {% if submitted_input %}
+                <div class="submitted-inspection-card">
+                    <div class="inspection-header">
+                        <span class="summary-label">INSPECT SUBMITTED VALUES</span>
+                        <h3>Escaped Input Review</h3>
+                    </div>
+                    <dl class="submitted-list">
+                        <div>
+                            <dt>Username</dt>
+                            <dd><code>{{ submitted_input.username }}</code></dd>
+                        </div>
+                        <div>
+                            <dt>Search Query</dt>
+                            <dd><code>{{ submitted_input.search_query }}</code></dd>
+                        </div>
+                        <div>
+                            <dt>Comment / Feedback</dt>
+                            <dd class="submitted-comment"><code>{{ submitted_input.comment }}</code></dd>
+                        </div>
+                    </dl>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

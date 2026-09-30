@@ -1,0 +1,160 @@
+{% extends "base_product.html" %}
+
+{% block title %}XShield &middot; Controlled Demo Application{% endblock %}
+
+{% block content %}
+<div class="product-page demo-page">
+    <section class="page-hero">
+        <div class="product-container">
+            <span class="section-eyebrow">CONTROLLED INTEGRATION DEMO</span>
+            <h1 class="page-title">Live Demo Application</h1>
+            <p class="page-lead">
+                A mock corporate web application protected by XShield. Inputs submitted below are evaluated in real time via the XShield pipeline and logged to the SQLite event ledger for inspection in the Security Console.
+            </p>
+        </div>
+    </section>
+
+    <!-- Demo Application Shell -->
+    <section class="demo-portal-section">
+        <div class="product-container">
+            <!-- Simulated Client App Card -->
+            <div class="soc-card demo-app-window">
+                <div class="window-topbar">
+                    <div class="window-dots">
+                        <span class="dot-red"></span>
+                        <span class="dot-yellow"></span>
+                        <span class="dot-green"></span>
+                    </div>
+                    <div class="window-url-bar">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        <span>https://portal.internal.corp/demo</span>
+                    </div>
+                    <div class="window-shield-tag">
+                        <span class="status-pulse-dot"></span>
+                        <span>Protected by XShield</span>
+                    </div>
+                </div>
+
+                <div class="demo-portal-body">
+                    <div class="portal-header">
+                        <h2>Apex Internal Portal</h2>
+                        <p>Employee knowledgebase, search directory, and support ticketing.</p>
+                    </div>
+
+                    <!-- Quick Simulation Toolbar -->
+                    <div class="demo-actions-toolbar">
+                        <span class="toolbar-label">One-Click Demonstration Triggers:</span>
+                        <div class="toolbar-buttons">
+                            <form method="post" action="{{ url_for('main.demo_app') }}" style="display: inline;">
+                                <input type="hidden" name="simulation_type" value="benign">
+                                <button type="submit" class="btn-demo-trigger btn-trigger-benign">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    <span>Simulate Benign Request</span>
+                                </button>
+                            </form>
+
+                            <form method="post" action="{{ url_for('main.demo_app') }}" style="display: inline;">
+                                <input type="hidden" name="simulation_type" value="xss_probe">
+                                <button type="submit" class="btn-demo-trigger btn-trigger-probe">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg>
+                                    <span>Simulate XSS Attack Probe</span>
+                                </button>
+                            </form>
+
+                            <form method="post" action="{{ url_for('main.demo_app') }}" style="display: inline;">
+                                <input type="hidden" name="simulation_type" value="attack_burst">
+                                <button type="submit" class="btn-demo-trigger btn-trigger-burst">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                    <span>Simulate Rapid Burst (Triggers Behavioral &amp; Incidents)</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Manual Input Form -->
+                    <div class="portal-form-grid">
+                        <form method="post" action="{{ url_for('main.demo_app') }}" class="demo-form">
+                            <input type="hidden" name="simulation_type" value="custom">
+
+                            <div class="form-group">
+                                <label for="demo-endpoint">Simulated API Endpoint</label>
+                                <select id="demo-endpoint" name="endpoint" class="soc-select">
+                                    <option value="/portal/search">GET /portal/search (Search Query)</option>
+                                    <option value="/portal/tickets">POST /portal/tickets (Support Ticket)</option>
+                                    <option value="/portal/profile">POST /portal/profile (Bio Update)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="demo-payload">Parameter Value / Test Payload</label>
+                                <textarea id="demo-payload" name="payload" rows="4" placeholder="Enter plain text or script payload..." required maxlength="1000">{% if submitted_payload %}{{ submitted_payload }}{% else %}<script>alert('XSS Demo')</script>{% endif %}</textarea>
+                            </div>
+
+                            <button type="submit" class="primary-button">
+                                <span>Submit through XShield Ingestion</span>
+                                <span aria-hidden="true">&rarr;</span>
+                            </button>
+                        </form>
+
+                        <div class="demo-guidance-card">
+                            <h4>How this demonstration works</h4>
+                            <ol class="guidance-steps">
+                                <li><strong>Ingestion:</strong> The Portal sends input to XShield's shared analysis engine with endpoint <code>{{ endpoint or "/portal/search" }}</code>.</li>
+                                <li><strong>Evaluation:</strong> Independent Rule (R001–R006) and ML (TF-IDF+LR) engines compute risk.</li>
+                                <li><strong>Decision:</strong> If risk is High or Critical, the action engine blocks the payload before execution.</li>
+                                <li><strong>Intelligence:</strong> The event is recorded in SQLite. Multiple probes trigger Phase 6 bursts and Phase 7 incident correlation cards in the Console.</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <!-- Live XShield Interception Banner -->
+                    {% if demo_result %}
+                    <div class="interception-banner {% if demo_result.action_result.blocked %}banner-blocked{% else %}banner-allowed{% endif %}">
+                        <div class="interception-header">
+                            <div class="interception-status">
+                                {% if demo_result.action_result.blocked %}
+                                <span class="badge risk-badge risk-critical">ACTION: BLOCKED</span>
+                                <strong>XShield Intercepted &amp; Suppressed Threat</strong>
+                                {% else %}
+                                <span class="badge risk-badge risk-low">ACTION: ALLOWED</span>
+                                <strong>Input Passed Security Validation</strong>
+                                {% endif %}
+                            </div>
+                            <span class="interception-meta">Risk Score: <strong>{{ "%.2f"|format(demo_result.risk_result.risk_score) }} / 100</strong> ({{ demo_result.risk_result.risk_level }})</span>
+                        </div>
+
+                        <div class="interception-body">
+                            <p><strong>Defensive Reason:</strong> {{ demo_result.action_result.action_message }} &middot; {{ demo_result.action_result.reason }}</p>
+                            {% if demo_result.rule_result.rule_details %}
+                            <div class="interception-rules">
+                                <span>Triggered Rules:</span>
+                                {% for r in demo_result.rule_result.rule_details %}
+                                <code>{{ r.rule_id }}: {{ r.name }} (+{{ r.weight }})</code>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <div class="interception-footer">
+                                <span>Event ID #{{ demo_result.logging_result.event_id }} recorded to SQLite ledger.</span>
+                                <a href="{{ url_for('main.dashboard') }}" class="btn-console-link">View in Security Console &rarr;</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bottom CTA Bar -->
+    <section class="cta-section">
+        <div class="product-container cta-card">
+            <h2>Inspect Real Telemetry</h2>
+            <p>View the real-time event logs, correlated incident clusters, and behavioral score generated by your actions.</p>
+            <div class="cta-btn-group">
+                <a href="{{ url_for('main.dashboard') }}" class="btn-primary-hero">Open Security Console</a>
+                <a href="{{ url_for('main.scanner') }}" class="btn-secondary-hero">Open Standalone Scanner</a>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

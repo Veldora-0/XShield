@@ -1,0 +1,134 @@
+{% extends "base_console.html" %}
+
+{% block title %}XShield Console &middot; Behavioral Intelligence{% endblock %}
+{% block console_title %}Behavioral Intelligence (Phase 6){% endblock %}
+
+{% block content %}
+<div class="dashboard-page">
+    <section class="soc-hero">
+        <div class="soc-hero-content">
+            <div class="soc-hero-title-area">
+                <div class="soc-eyebrow">
+                    <span class="eyebrow-dot"></span>
+                    <span>PHASE 6 HEURISTIC TELEMETRY</span>
+                </div>
+                <h1 class="soc-headline">Behavioral Intelligence &amp; Context</h1>
+                <p class="soc-subheadline">
+                    Quantifies attack velocity, targeting repetition, and indicator diversity across recent application events to derive explainable operational threat context.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Threat Score & Status Overview -->
+    <div class="soc-two-col-layout">
+        <div class="soc-main-column">
+            <section class="soc-card soc-panel">
+                <div class="panel-heading">
+                    <h2>Four Core Behavioral Heuristic Signals</h2>
+                    <span class="panel-meta">Application Context Evaluation</span>
+                </div>
+
+                <div class="behavioral-signals-grid">
+                    <!-- Signal 1: Repeated Activity -->
+                    <div class="signal-card {% if behavior.repeated_activity %}signal-alert{% endif %}">
+                        <div class="signal-card-top">
+                            <span class="signal-badge">SIGNAL 1</span>
+                            <span class="badge {% if behavior.repeated_activity %}risk-badge risk-high{% else %}action-badge action-allow{% endif %}">
+                                {{ "DETECTED" if behavior.repeated_activity else "CLEAR" }}
+                            </span>
+                        </div>
+                        <h3>Repeated Suspicious Activity</h3>
+                        <p>Triggers when multiple flagged or blocked events originate within the active evaluation window for the current application.</p>
+                        <span class="signal-condition">Threshold: &ge; 2 suspicious events in recent history</span>
+                    </div>
+
+                    <!-- Signal 2: Endpoint Targeting -->
+                    <div class="signal-card {% if behavior.endpoint_repetition %}signal-alert{% endif %}">
+                        <div class="signal-card-top">
+                            <span class="signal-badge">SIGNAL 2</span>
+                            <span class="badge {% if behavior.endpoint_repetition %}risk-badge risk-high{% else %}action-badge action-allow{% endif %}">
+                                {{ "DETECTED" if behavior.endpoint_repetition else "CLEAR" }}
+                            </span>
+                        </div>
+                        <h3>Normalized Endpoint Targeting</h3>
+                        <p>Triggers when an attacker repeatedly targets the same application route (e.g. <code>/search</code> or <code>/login</code>) with varying payloads.</p>
+                        <span class="signal-condition">Threshold: &ge; 3 events targeting the identical endpoint</span>
+                    </div>
+
+                    <!-- Signal 3: Event Burst -->
+                    <div class="signal-card {% if behavior.burst_activity %}signal-alert{% endif %}">
+                        <div class="signal-card-top">
+                            <span class="signal-badge">SIGNAL 3</span>
+                            <span class="badge {% if behavior.burst_activity %}risk-badge risk-critical{% else %}action-badge action-allow{% endif %}">
+                                {{ "DETECTED" if behavior.burst_activity else "CLEAR" }}
+                            </span>
+                        </div>
+                        <h3>Short-Window Event Burst</h3>
+                        <p>Flags automated or tool-assisted probing where request velocity exceeds ordinary human interaction speeds.</p>
+                        <span class="signal-condition">Threshold: &ge; 4 events within a 60-second burst window</span>
+                    </div>
+
+                    <!-- Signal 4: Pattern Diversity -->
+                    <div class="signal-card {% if behavior.pattern_diversity %}signal-alert{% endif %}">
+                        <div class="signal-card-top">
+                            <span class="signal-badge">SIGNAL 4</span>
+                            <span class="badge {% if behavior.pattern_diversity %}risk-badge risk-medium{% else %}action-badge action-allow{% endif %}">
+                                {{ "DETECTED" if behavior.pattern_diversity else "CLEAR" }}
+                            </span>
+                        </div>
+                        <h3>Detection Pattern Diversity</h3>
+                        <p>Identifies multi-vector attacks where an adversary rotates between script tags, event handlers, and encoded URL schemes.</p>
+                        <span class="signal-condition">Threshold: &ge; 2 distinct rule categories matched in history</span>
+                    </div>
+                </div>
+
+                {% if behavior.reasons %}
+                <div class="soc-card reasons-breakdown-card">
+                    <h4>Active Trigger Explanations:</h4>
+                    <ul class="reasons-bullet-list">
+                        {% for r in behavior.reasons %}
+                        <li><strong>&bull;</strong> {{ r }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </section>
+        </div>
+
+        <!-- Right Rail: Score Gauge & Boundaries -->
+        <aside class="soc-rail-column">
+            <section class="soc-card soc-panel">
+                <div class="panel-heading">
+                    <h2>Threat Score</h2>
+                </div>
+                <div class="behavior-score-card">
+                    <div class="score-dial-wrap">
+                        <div class="score-circle">
+                            <strong class="score-val">{{ behavior.behavioral_score }}</strong>
+                            <small class="score-denom">/ 100</small>
+                        </div>
+                    </div>
+                    <div class="score-dial-info">
+                        <span class="score-rating-label">
+                            {% if behavior.behavioral_score >= 60 %}
+                            ELEVATED ATTACK PATTERN
+                            {% elif behavior.behavioral_score >= 30 %}
+                            SUSPICIOUS BEHAVIOR
+                            {% else %}
+                            NOMINAL HEURISTIC
+                            {% endif %}
+                        </span>
+                        <p class="behavior-score-text">Score combines signal weights dynamically without altering detector decisions.</p>
+                    </div>
+                </div>
+
+                <div class="soc-guidance-box">
+                    <h4>Defensive Boundaries Note</h4>
+                    <p>Behavioral signals are deterministic, project-defined heuristics. They reflect observed application traffic patterns and do not claim to identify physical human attacker identity or replace host-based IDS.</p>
+                </div>
+            </section>
+        </aside>
+    </div>
+</div>
+{% endblock %}

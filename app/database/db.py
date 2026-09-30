@@ -582,3 +582,22 @@ def get_filtered_events(
     with _connect(database_path) as connection:
         rows = connection.execute(query, parameters).fetchall()
     return [_deserialize_event(row) for row in rows]
+
+
+def reset_demo_events(database_path: str | Path = DEFAULT_DATABASE_PATH) -> int:
+    """Safely delete all recorded security events within an atomic transaction.
+
+    Preserves registered applications, integration API keys, and schema migrations.
+    Returns the count of deleted events.
+    """
+    with _connect(database_path) as connection:
+        cursor = connection.execute("DELETE FROM security_events")
+        deleted_count = cursor.rowcount
+        try:
+            connection.execute(
+                "DELETE FROM sqlite_sequence WHERE name = 'security_events'"
+            )
+        except sqlite3.OperationalError:
+            pass
+    return int(deleted_count)
+

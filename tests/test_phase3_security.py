@@ -1,11 +1,26 @@
+import tempfile
 import unittest
+from pathlib import Path
 
 from app import create_app
+from app.database import initialize_database
 
 
 class Phase3SecurityTests(unittest.TestCase):
     def setUp(self):
-        self.client = create_app().test_client()
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.database_path = Path(self.temp_dir.name) / "phase3.sqlite3"
+        initialize_database(self.database_path)
+        self.app = create_app(
+            {
+                "TESTING": True,
+                "DATABASE_PATH": str(self.database_path),
+            }
+        )
+        self.client = self.app.test_client()
+
+    def tearDown(self):
+        self.temp_dir.cleanup()
 
     def test_homepage_loads(self):
         response = self.client.get("/")

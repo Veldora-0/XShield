@@ -61,29 +61,51 @@ class ActionEngineTests(unittest.TestCase):
             assess_action(risk_result("High", 30))
 
     def test_flask_blocks_high_risk_content_without_displaying_submitted_text(self):
-        response = create_app().test_client().post(
-            "/",
-            data={
-                "username": "student_01",
-                "search_query": "security",
-                "comment": '<img src="javascript:demo" onerror="run()">',
-            },
-        )
+        import tempfile
+        from pathlib import Path
 
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(b"RESPONSE ACTION", response.data)
-        self.assertIn(b"block", response.data)
-        self.assertIn(b"rejected it", response.data)
-        self.assertNotIn(b"&lt;img", response.data)
-        self.assertNotIn(b"<img src=", response.data)
+        with tempfile.TemporaryDirectory() as directory:
+            database_path = Path(directory) / "action_engine.sqlite3"
+            app = create_app(
+                {
+                    "TESTING": True,
+                    "DATABASE_PATH": str(database_path),
+                }
+            )
+            response = app.test_client().post(
+                "/",
+                data={
+                    "username": "student_01",
+                    "search_query": "security",
+                    "comment": '<img src="javascript:demo" onerror="run()">',
+                },
+            )
+
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b"RESPONSE ACTION", response.data)
+            self.assertIn(b"block", response.data)
+            self.assertIn(b"rejected it", response.data)
+            self.assertNotIn(b"&lt;img", response.data)
+            self.assertNotIn(b"<img src=", response.data)
 
     def test_security_headers_are_present(self):
-        response = create_app({"TESTING": True}).test_client().get("/")
+        import tempfile
+        from pathlib import Path
 
-        self.assertIn(b"default-src 'self'", response.headers["Content-Security-Policy"].encode())
-        self.assertEqual(response.headers["X-Content-Type-Options"], "nosniff")
-        self.assertEqual(response.headers["X-Frame-Options"], "DENY")
-        self.assertEqual(response.headers["Referrer-Policy"], "no-referrer")
+        with tempfile.TemporaryDirectory() as directory:
+            database_path = Path(directory) / "headers.sqlite3"
+            app = create_app(
+                {
+                    "TESTING": True,
+                    "DATABASE_PATH": str(database_path),
+                }
+            )
+            response = app.test_client().get("/")
+
+            self.assertIn(b"default-src 'self'", response.headers["Content-Security-Policy"].encode())
+            self.assertEqual(response.headers["X-Content-Type-Options"], "nosniff")
+            self.assertEqual(response.headers["X-Frame-Options"], "DENY")
+            self.assertEqual(response.headers["Referrer-Policy"], "no-referrer")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,133 @@
+{% extends "base_console.html" %}
+
+{% block title %}XShield Console &middot; Security Events Ledger{% endblock %}
+{% block console_title %}Security Events Ledger{% endblock %}
+
+{% block content %}
+<div class="dashboard-page">
+    <section class="soc-hero">
+        <div class="soc-hero-content">
+            <div class="soc-hero-title-area">
+                <div class="soc-eyebrow">
+                    <span class="eyebrow-dot"></span>
+                    <span>DEFENSIVE TELEMETRY LEDGER</span>
+                </div>
+                <h1 class="soc-headline">Security Events Review</h1>
+                <p class="soc-subheadline">
+                    Complete historical log of observed application parameters, HTTP endpoints, ML predictions, and automated risk decisions.
+                </p>
+            </div>
+            <div class="panel-meta-chip">
+                <span>Showing latest {{ event_limit }} events</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filter Form -->
+    <section class="soc-card soc-panel">
+        <form class="soc-filter-toolbar" method="get" action="{{ url_for('main.dashboard_events') }}">
+            <div class="filter-field">
+                <label for="filter-risk" class="filter-label">Risk level</label>
+                <div class="select-wrapper">
+                    <select id="filter-risk" name="risk_level">
+                        {% for level in ("All", "Low", "Medium", "High", "Critical") %}
+                        <option value="{{ level }}" {% if selected_risk == level %}selected{% endif %}>{{ level }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="filter-field">
+                <label for="filter-action" class="filter-label">Action</label>
+                <div class="select-wrapper">
+                    <select id="filter-action" name="action">
+                        {% for value, label in (("All", "All"), ("allow", "Allow"), ("flag", "Monitor"), ("block", "Block"), ("block_and_alert", "Block + Alert")) %}
+                        <option value="{{ value }}" {% if selected_action == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="filter-field filter-search">
+                <label for="filter-search" class="filter-label">Search</label>
+                <div class="search-input-wrap">
+                    <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input id="filter-search" type="search" name="search" value="{{ search }}" maxlength="100" placeholder="Filter by input, ML label, agreement">
+                </div>
+            </div>
+
+            <div class="filter-actions">
+                <button class="primary-button filter-button" type="submit">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                    <span>Filter</span>
+                </button>
+                {% if selected_risk != 'All' or selected_action != 'All' or search %}
+                <a href="{{ url_for('main.dashboard_events') }}" class="btn-reset-filters">Reset</a>
+                {% endif %}
+            </div>
+        </form>
+
+        {% if events %}
+        <div class="table-wrapper">
+            <table class="soc-table events-table">
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>Timestamp (UTC)</th>
+                        <th>Application</th>
+                        <th>Type / Endpoint</th>
+                        <th>Risk Score</th>
+                        <th>Severity</th>
+                        <th>Action</th>
+                        <th>Detection Signal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                    <tr class="soc-table-row">
+                        <td class="cell-event-id">
+                            <a class="event-id-link" href="{{ url_for('main.dashboard_event', event_id=event.id) }}">
+                                #{{ event.id }}
+                            </a>
+                        </td>
+                        <td class="cell-timestamp"><span class="mono-time">{{ event.timestamp }}</span></td>
+                        <td class="cell-app">
+                            <span class="app-chip">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"></rect><rect x="2" y="14" width="20" height="8" rx="2"></rect></svg>
+                                <span>{{ event.application_name }}</span>
+                            </span>
+                        </td>
+                        <td class="cell-endpoint">
+                            <strong class="event-type-badge">{{ event.event_type or "browser_analysis" }}</strong>
+                            <code class="endpoint-text table-subtext">{{ event.endpoint or "Local input" }}</code>
+                        </td>
+                        <td><strong class="mono-sub">{{ "%.1f"|format(event.risk_score) }}/100</strong></td>
+                        <td class="cell-risk">
+                            <span class="badge risk-badge risk-{{ event.risk_level|lower }}">
+                                <span class="badge-dot"></span>
+                                {{ event.risk_level }}
+                            </span>
+                        </td>
+                        <td class="cell-action">
+                            <span class="badge action-badge action-{{ event.action|replace('_', '-') }}">
+                                {{ event.action|replace('_', ' ') }}
+                            </span>
+                        </td>
+                        <td class="cell-detection">
+                            <strong class="pred-label pred-{{ event.ml_prediction }}">{{ event.ml_prediction }}</strong>
+                            <span class="agreement-label table-subtext">{{ event.detector_agreement }}</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="soc-empty-box">
+            <p class="empty-state">No matching security events observed.</p>
+            <p class="empty-guidance">Execute requests in the Demo App or Payload Scanner to generate telemetry.</p>
+        </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

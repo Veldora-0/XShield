@@ -1,0 +1,211 @@
+{% extends "base_product.html" %}
+
+{% block title %}XShield &middot; Benchmark Evaluation &middot; Held-Out Test Results{% endblock %}
+
+{% block content %}
+<div class="product-page benchmark-page">
+    <section class="page-hero">
+        <div class="product-container">
+            <span class="section-eyebrow">REPRODUCIBLE EVALUATION</span>
+            <h1 class="page-title">Offline Benchmark Results</h1>
+            <p class="page-lead">
+                Comparative evaluation of Rule-Based, Machine Learning, and Hybrid detection pipelines evaluated on the identical held-out test split of 3,967 samples from the HttpParamsDataset.
+            </p>
+        </div>
+    </section>
+
+    <!-- Key Performance Banner -->
+    <section class="benchmark-summary-section">
+        <div class="product-container">
+            <div class="benchmark-metrics-grid">
+                <div class="benchmark-metric-card">
+                    <span class="benchmark-label">ML MODEL ACCURACY</span>
+                    <strong class="benchmark-val">99.90%</strong>
+                    <span class="benchmark-sub">0.99899 on held-out test set</span>
+                </div>
+                <div class="benchmark-metric-card">
+                    <span class="benchmark-label">XSS PRECISION</span>
+                    <strong class="benchmark-val">100.0%</strong>
+                    <span class="benchmark-sub">0 False Positives observed</span>
+                </div>
+                <div class="benchmark-metric-card">
+                    <span class="benchmark-label">ML RECALL</span>
+                    <strong class="benchmark-val">96.23%</strong>
+                    <span class="benchmark-sub">102 of 106 XSS identified</span>
+                </div>
+                <div class="benchmark-metric-card">
+                    <span class="benchmark-label">ML F1-SCORE</span>
+                    <strong class="benchmark-val">98.08%</strong>
+                    <span class="benchmark-sub">Harmonic mean of precision &amp; recall</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Detailed Method Comparison Table -->
+    <section class="benchmark-table-section">
+        <div class="product-container">
+            <div class="soc-card benchmark-table-card">
+                <div class="card-header-group">
+                    <h3>Method Performance Comparison</h3>
+                    <span class="header-note">Identical held-out test set: 3,967 samples (3,861 Benign, 106 XSS)</span>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="soc-table benchmark-table">
+                        <thead>
+                            <tr>
+                                <th>Method</th>
+                                <th>Accuracy</th>
+                                <th>Precision (XSS)</th>
+                                <th>Recall (XSS)</th>
+                                <th>F1-Score</th>
+                                <th>False Positives</th>
+                                <th>False Negatives</th>
+                                <th>Avg Latency</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Rule-Based Detector</strong></td>
+                                <td>99.80%</td>
+                                <td>100.00%</td>
+                                <td>92.45%</td>
+                                <td>96.08%</td>
+                                <td><span class="num-zero">0</span></td>
+                                <td>8</td>
+                                <td class="mono-sub">~0.015 ms</td>
+                            </tr>
+                            <tr class="highlight-row">
+                                <td><strong>Machine Learning (TF-IDF + LR)</strong></td>
+                                <td><strong class="score-accent">99.90%</strong></td>
+                                <td><strong class="score-accent">100.00%</strong></td>
+                                <td><strong class="score-accent">96.23%</strong></td>
+                                <td><strong class="score-accent">98.08%</strong></td>
+                                <td><span class="num-zero">0</span></td>
+                                <td>4</td>
+                                <td class="mono-sub">~0.025 ms</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Hybrid Detector (50/50 Fusion)</strong></td>
+                                <td>99.80%</td>
+                                <td>100.00%</td>
+                                <td>92.45%</td>
+                                <td>96.08%</td>
+                                <td><span class="num-zero">0</span></td>
+                                <td>8</td>
+                                <td class="mono-sub">~0.752 ms</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Confusion Matrices Display -->
+    <section class="confusion-matrices-section">
+        <div class="product-container">
+            <h2 class="section-heading">Detailed Confusion Matrices</h2>
+            <div class="matrices-grid">
+                <!-- 1. ML Confusion Matrix -->
+                <div class="soc-card matrix-card">
+                    <div class="matrix-card-header">
+                        <h4>Machine Learning Baseline (TF-IDF + LR)</h4>
+                        <span class="matrix-threshold">Threshold: Probability &ge; 0.50</span>
+                    </div>
+                    <div class="matrix-table-wrap">
+                        <table class="matrix-table">
+                            <thead>
+                                <tr>
+                                    <th>Actual \ Predicted</th>
+                                    <th>Pred Benign (0)</th>
+                                    <th>Pred XSS (1)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>Actual Benign (0)</th>
+                                    <td class="cell-tn"><strong>3,861</strong><small>True Negative</small></td>
+                                    <td class="cell-fp"><strong>0</strong><small>False Positive</small></td>
+                                </tr>
+                                <tr>
+                                    <th>Actual XSS (1)</th>
+                                    <td class="cell-fn"><strong>4</strong><small>False Negative</small></td>
+                                    <td class="cell-tp"><strong>102</strong><small>True Positive</small></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 2. Rule-Based Confusion Matrix -->
+                <div class="soc-card matrix-card">
+                    <div class="matrix-card-header">
+                        <h4>Rule-Based Detector (R001–R006)</h4>
+                        <span class="matrix-threshold">Threshold: Rule Score &ge; 1</span>
+                    </div>
+                    <div class="matrix-table-wrap">
+                        <table class="matrix-table">
+                            <thead>
+                                <tr>
+                                    <th>Actual \ Predicted</th>
+                                    <th>Pred Benign (0)</th>
+                                    <th>Pred XSS (1)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>Actual Benign (0)</th>
+                                    <td class="cell-tn"><strong>3,861</strong><small>True Negative</small></td>
+                                    <td class="cell-fp"><strong>0</strong><small>False Positive</small></td>
+                                </tr>
+                                <tr>
+                                    <th>Actual XSS (1)</th>
+                                    <td class="cell-fn"><strong>8</strong><small>False Negative</small></td>
+                                    <td class="cell-tp"><strong>98</strong><small>True Positive</small></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Evaluation Methodology & Disclaimers -->
+    <section class="methodology-section">
+        <div class="product-container">
+            <div class="soc-card methodology-card">
+                <h3>Evaluation Methodology &amp; Scientific Limitations</h3>
+                <div class="methodology-points">
+                    <div class="method-item">
+                        <strong>Held-Out Test Set Isolation</strong>
+                        <p>The held-out test split of 3,967 samples was never used to fit the TF-IDF vectorizer or Logistic Regression classifier. It was strictly isolated until offline model evaluation.</p>
+                    </div>
+                    <div class="method-item">
+                        <strong>Class Imbalance Context</strong>
+                        <p>The test set contains 3,861 benign parameter strings and 106 XSS attacks. Because of this natural imbalance, F1-score and Recall are the primary indicators of defensive efficacy rather than raw accuracy alone.</p>
+                    </div>
+                    <div class="method-item">
+                        <strong>Important Research Disclaimer</strong>
+                        <p>These benchmark results apply specifically to the selected <code>HttpParamsDataset</code> held-out test split. <strong>They are not real-world guarantees of detecting 100% of all future, fragmented, or polymorphic XSS attacks.</strong> XShield is a defensive risk-assessment prototype and must be paired with trusted output encoding and web application firewalls in production.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bottom CTA -->
+    <section class="cta-section">
+        <div class="product-container cta-card">
+            <h2>Verify with Live Payloads</h2>
+            <p>Run your own malicious or benign strings through the exact same trained model in our Scanner.</p>
+            <div class="cta-btn-group">
+                <a href="{{ url_for('main.scanner') }}" class="btn-primary-hero">Launch Scanner</a>
+                <a href="{{ url_for('main.rules_catalog') }}" class="btn-secondary-hero">Explore Active Rules</a>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

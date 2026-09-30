@@ -1,29 +1,109 @@
-{% extends "base.html" %}
+{% extends "base_console.html" %}
 
-{% block title %}XShield | Event {{ event.id }}{% endblock %}
+{% block title %}XShield Console &middot; Event #{{ event.id }}{% endblock %}
+{% block console_title %}Security Event Detail #{{ event.id }}{% endblock %}
 
 {% block content %}
-<section class="workspace-section">
-    <div class="container">
-        <div class="result-card">
-            <p class="eyebrow">SECURITY EVENT DETAIL</p>
-            <h1>Event #{{ event.id }}</h1>
-            <div class="event-detail-grid">
-                <div><dt>Timestamp</dt><dd>{{ event.timestamp }}</dd></div>
-                <div><dt>Risk Score</dt><dd>{{ "%.2f"|format(event.risk_score) }} / 100</dd></div>
-                <div><dt>Risk Level</dt><dd>{{ event.risk_level }}</dd></div>
-                <div><dt>Action</dt><dd>{{ event.action }}</dd></div>
-                <div><dt>Rule Score</dt><dd>{{ "%.2f"|format(event.rule_score) }} / 100</dd></div>
-                <div><dt>Hybrid Signal</dt><dd>{{ "%.4f"|format(event.hybrid_signal) }}</dd></div>
-                <div><dt>ML Prediction</dt><dd>{{ event.ml_prediction }}</dd></div>
-                <div><dt>ML Probability</dt><dd>{{ "%.4f"|format(event.ml_probability) }}</dd></div>
-                <div><dt>Agreement</dt><dd>{{ event.detector_agreement }}</dd></div>
+<div class="container event-detail-page">
+    <div class="breadcrumb-bar">
+        <a class="text-link" href="{{ url_for('main.dashboard') }}">&larr; Back to dashboard</a>
+    </div>
+
+    <div class="soc-card result-card risk-border-{{ event.risk_level|lower }}">
+        <div class="event-detail-header">
+            <div>
+                <div class="soc-eyebrow">
+                    <span class="eyebrow-dot"></span>
+                    <span>SECURITY EVENT DETAIL</span>
+                </div>
+                <h1 class="event-headline">Event #{{ event.id }}</h1>
             </div>
-            <div class="detail-block"><dt>Matched Rules</dt><dd>{{ event.matched_rules|join(", ") if event.matched_rules else "None" }}</dd></div>
-            <div class="detail-block"><dt>Reasons</dt><dd>{% for reason in event.reasons %}<div>{{ reason }}</div>{% else %}None{% endfor %}</dd></div>
-            <div class="detail-block"><dt>Stored Input (escaped text)</dt><dd class="submitted-comment">{{ event.input_text }}</dd></div>
-            <a class="text-link" href="{{ url_for('main.dashboard') }}">Back to dashboard</a>
+            <div class="event-header-badges">
+                <span class="badge risk-badge risk-{{ event.risk_level|lower }}">
+                    <span class="badge-dot"></span>
+                    {{ event.risk_level }} Risk
+                </span>
+                <span class="badge action-badge action-{{ event.action|replace('_', '-') }}">
+                    {{ event.action|replace('_', ' ') }}
+                </span>
+            </div>
+        </div>
+
+        <div class="event-detail-grid">
+            <div class="detail-cell">
+                <dt>Timestamp</dt>
+                <dd><span class="mono-time">{{ event.timestamp }}</span></dd>
+            </div>
+            <div class="detail-cell">
+                <dt>Risk Score</dt>
+                <dd><strong>{{ "%.2f"|format(event.risk_score) }} / 100</strong></dd>
+            </div>
+            <div class="detail-cell">
+                <dt>Risk Level</dt>
+                <dd><span class="risk-label risk-{{ event.risk_level|lower }}">{{ event.risk_level }}</span></dd>
+            </div>
+            <div class="detail-cell">
+                <dt>Action</dt>
+                <dd><span class="action-label">{{ event.action }}</span></dd>
+            </div>
+            <div class="detail-cell">
+                <dt>Rule Score</dt>
+                <dd><strong>{{ "%.2f"|format(event.rule_score) }} / 100</strong></dd>
+            </div>
+            <div class="detail-cell">
+                <dt>Hybrid Signal</dt>
+                <dd><span class="mono-sub">{{ "%.4f"|format(event.hybrid_signal) }}</span></dd>
+            </div>
+            <div class="detail-cell">
+                <dt>ML Prediction</dt>
+                <dd><strong class="pred-label pred-{{ event.ml_prediction }}">{{ event.ml_prediction }}</strong></dd>
+            </div>
+            <div class="detail-cell">
+                <dt>ML Probability</dt>
+                <dd><span class="mono-sub">{{ "%.4f"|format(event.ml_probability) }}</span></dd>
+            </div>
+            <div class="detail-cell">
+                <dt>Agreement</dt>
+                <dd><span class="mono-sub">{{ event.detector_agreement }}</span></dd>
+            </div>
+        </div>
+
+        <div class="detail-block">
+            <dt>Matched Rules</dt>
+            <dd>
+                {% if event.matched_rules %}
+                <div class="matched-rules-chips">
+                    {% for r in event.matched_rules %}
+                    <span class="rule-chip"><code>{{ r }}</code></span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <span class="empty-detail">None</span>
+                {% endif %}
+            </dd>
+        </div>
+
+        <div class="detail-block">
+            <dt>Reasons</dt>
+            <dd>
+                {% for reason in event.reasons %}
+                <div class="reason-bullet">&bull; {{ reason }}</div>
+                {% else %}
+                <span class="empty-detail">None</span>
+                {% endfor %}
+            </dd>
+        </div>
+
+        <div class="detail-block">
+            <dt>Stored Input (escaped text)</dt>
+            <dd class="submitted-comment">
+                <pre class="payload-box"><code>{{ event.input_text }}</code></pre>
+            </dd>
+        </div>
+
+        <div class="detail-footer">
+            <a class="text-link" href="{{ url_for('main.dashboard') }}">&larr; Back to dashboard</a>
         </div>
     </div>
-</section>
+</div>
 {% endblock %}

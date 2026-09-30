@@ -1,0 +1,157 @@
+{% extends "base_product.html" %}
+
+{% block title %}XShield &middot; How It Works &middot; Architecture &amp; Pipeline{% endblock %}
+
+{% block content %}
+<div class="product-page how-it-works-page">
+    <section class="page-hero">
+        <div class="product-container">
+            <span class="section-eyebrow">DEFENSIVE ARCHITECTURE</span>
+            <h1 class="page-title">How XShield Works</h1>
+            <p class="page-lead">
+                An explainable, multi-stage detection and correlation pipeline that evaluates user input, assesses risk, derives behavioral patterns, and groups security events into actionable incidents.
+            </p>
+        </div>
+    </section>
+
+    <!-- Visual Architecture Flowchart -->
+    <section class="architecture-flow-section">
+        <div class="product-container">
+            <div class="pipeline-flow-card">
+                <div class="pipeline-step">
+                    <div class="step-num">01</div>
+                    <div class="step-content">
+                        <h3>Application Input</h3>
+                        <p>User-controlled text submitted via the browser form or received via the versioned integration API (<code>POST /api/v1/events</code>). Server-side length bounding and character format validation are applied immediately.</p>
+                        <span class="step-tag">SecurityEventContract</span>
+                    </div>
+                </div>
+
+                <div class="flow-connector">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+                </div>
+
+                <div class="pipeline-fork">
+                    <div class="fork-branch">
+                        <div class="step-num">02A</div>
+                        <div class="step-content">
+                            <h3>Rule Detector (Heuristics)</h3>
+                            <p>Six explainable rule categories (R001–R006). Preprocesses input with case-folding and single-layer entity/URL decoding. Identifies markup, execution functions, event handlers, and obfuscation. Never executes payload.</p>
+                            <span class="step-tag">app.detector.rules</span>
+                        </div>
+                    </div>
+
+                    <div class="fork-branch">
+                        <div class="step-num">02B</div>
+                        <div class="step-content">
+                            <h3>ML Predictor (TF-IDF + LR)</h3>
+                            <p>Transforms raw text into 54,919 character n-gram features (3–5 characters) using a saved offline-trained vectorizer. A balanced Logistic Regression classifier predicts binary label and calibrated XSS probability.</p>
+                            <span class="step-tag">app.ml.predictor</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-connector">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+                </div>
+
+                <div class="pipeline-step">
+                    <div class="step-num">03</div>
+                    <div class="step-content">
+                        <h3>Hybrid Fusion Signal</h3>
+                        <p>Fuses normalized rule score (0.0–1.0) with ML XSS probability using configurable weights (default: 50% rule + 50% ML). Tracks detector agreement (both benign, both attack, or disagreement) for transparent telemetry.</p>
+                        <span class="step-tag">app.detector.hybrid_detector</span>
+                    </div>
+                </div>
+
+                <div class="flow-connector">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+                </div>
+
+                <div class="pipeline-step">
+                    <div class="step-num">04</div>
+                    <div class="step-content">
+                        <h3>Risk Engine &amp; Response Action</h3>
+                        <p>Maps the continuous hybrid signal to a 0–100 risk score and project-defined severity tiers: Low (0–29), Medium (30–59), High (60–79), Critical (80–100). The Action Engine applies defensive decisions: <code>allow</code>, <code>flag</code>, <code>block</code>, or <code>block_and_alert</code>.</p>
+                        <span class="step-tag">app.risk &amp; app.response</span>
+                    </div>
+                </div>
+
+                <div class="flow-connector">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+                </div>
+
+                <div class="pipeline-step">
+                    <div class="step-num">05</div>
+                    <div class="step-content">
+                        <h3>Behavioral Intelligence (Phase 6)</h3>
+                        <p>Evaluates bounded recent security events per application. Tracks repeated suspicious activity, normalized endpoint targeting, burst frequency (short-window velocity), and detection pattern diversity to quantify ongoing attack behavior.</p>
+                        <span class="step-tag">app.services.behavior</span>
+                    </div>
+                </div>
+
+                <div class="flow-connector">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+                </div>
+
+                <div class="pipeline-step">
+                    <div class="step-num">06</div>
+                    <div class="step-content">
+                        <h3>Incident Correlation (Phase 7)</h3>
+                        <p>Dynamically clusters related events within configured time windows based on shared request IDs, identical normalized endpoints, or overlapping matched-rule signatures. Computes deterministic incident hashes without manual rule scripting.</p>
+                        <span class="step-tag">app.services.incidents</span>
+                    </div>
+                </div>
+
+                <div class="flow-connector">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+                </div>
+
+                <div class="pipeline-step step-highlight">
+                    <div class="step-num">07</div>
+                    <div class="step-content">
+                        <h3>XShield Security Intelligence Console</h3>
+                        <p>All completed events, derived incidents, behavioral summaries, and application metadata are persisted securely in SQLite using parameterized queries and visualized in real time in the XShield Security Console.</p>
+                        <span class="step-tag">SOC Console (/dashboard)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Deep Dive Tech Cards -->
+    <section class="deep-dive-section">
+        <div class="product-container">
+            <h2 class="section-heading">Detailed Pipeline Specifications</h2>
+            <div class="deep-dive-grid">
+                <div class="deep-card">
+                    <h4>Why Character-Level TF-IDF?</h4>
+                    <p>Traditional word-level tokenizers fail on obfuscated XSS payloads because attackers split keywords (e.g. <code>&lt;scr&lt;script&gt;ipt&gt;</code>) or use URL/entity encodings. Character n-grams (3 to 5 characters) capture sub-word punctuation, tag openers, and delimiters directly.</p>
+                </div>
+
+                <div class="deep-card">
+                    <h4>Why Heuristic Rules alongside ML?</h4>
+                    <p>Machine learning provides generalization across unseen attack variants but can be prone to dataset bias. Explainable rules guarantee immediate detection of deterministic signatures (e.g. <code>javascript:</code> schemes and <code>onerror=</code> attributes) with exact violation reasons.</p>
+                </div>
+
+                <div class="deep-card">
+                    <h4>Fail-Closed Security Design</h4>
+                    <p>If any detector, vectorizer, or risk engine fails, XShield defaults to fail-closed application policy: access is denied and a controlled internal security event is logged rather than allowing potentially malicious input to bypass unanalysed.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bottom CTA -->
+    <section class="cta-section">
+        <div class="product-container cta-card">
+            <h2>Ready to see the pipeline in action?</h2>
+            <p>Run your own payloads through the pipeline or review our benchmark validation results.</p>
+            <div class="cta-btn-group">
+                <a href="{{ url_for('main.scanner') }}" class="btn-primary-hero">Launch Scanner</a>
+                <a href="{{ url_for('main.benchmark') }}" class="btn-secondary-hero">View Benchmarks</a>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

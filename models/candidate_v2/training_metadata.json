@@ -1,0 +1,43 @@
+{
+  "candidate_version": "v2.0-candidate",
+  "training_timestamp": "2026-09-30T07:08:17.914493+00:00",
+  "random_seed": 42,
+  "dataset": {
+    "train_path": "D:\\XShield\\data\\processed\\v2\\xss_train_v2.csv",
+    "val_path": "D:\\XShield\\data\\processed\\v2\\xss_val_v2.csv",
+    "train_samples": 17979,
+    "train_benign": 11444,
+    "train_xss": 6535,
+    "val_samples": 3173,
+    "val_benign": 2020,
+    "val_xss": 1153
+  },
+  "vectorizer_config": {
+    "analyzer": "char",
+    "ngram_range": [
+      3,
+      5
+    ],
+    "min_df": 2,
+    "sublinear_tf": true,
+    "vocabulary_size": 70773
+  },
+  "classifier_config": {
+    "model_type": "LogisticRegression",
+    "solver": "liblinear",
+    "class_weight": "balanced",
+    "max_iter": 1000,
+    "random_state": 42,
+    "iterations_run": 7
+  },
+  "validation_metrics": {
+    "accuracy": 0.9968484084462653,
+    "precision": 1.0,
+    "recall": 0.9913269731136166,
+    "f1": 0.9956445993031359
+  },
+  "artifact_paths": {
+    "model": "D:\\XShield\\models\\candidate_v2\\xss_logistic_regression.joblib",
+    "vectorizer": "D:\\XShield\\models\\candidate_v2\\xss_tfidf_vectorizer.joblib"
+  }
+}

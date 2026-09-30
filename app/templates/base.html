@@ -3,45 +3,154 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="XShield input security analysis interface">
-    <title>{% block title %}XShield{% endblock %}</title>
+    <meta name="description" content="XShield AI/ML-based XSS attack detection and defensive risk assessment platform">
+    <title>{% block title %}XShield | Security Operations{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body>
-    <header class="site-header">
-        <div class="container header-content">
-            <a class="brand" href="{{ url_for('main.index') }}" aria-label="XShield home">
-                <span class="brand-mark" aria-hidden="true">X</span>
-                <span>
-                    <strong>XShield</strong>
-                    <small>Security analysis platform</small>
-                </span>
-            </a>
-            <div class="status-pill">
-                <span class="status-dot" aria-hidden="true"></span>
-                Prototype environment
+<body class="soc-theme">
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar" id="app-sidebar" aria-label="Main Navigation">
+            <div class="sidebar-brand">
+                <a class="brand-link" href="{{ url_for('main.dashboard') }}" aria-label="XShield Home">
+                    <div class="brand-shield" aria-hidden="true">
+                        <svg width="22" height="24" viewBox="0 0 24 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 1L2 5.5V12C2 18.2 6.3 23.9 12 25.5C17.7 23.9 22 18.2 22 12V5.5L12 1Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="rgba(6, 182, 212, 0.12)"/>
+                            <path d="M8.5 9.5L15.5 16.5M15.5 9.5L8.5 16.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="brand-text">
+                        <strong>XShield</strong>
+                        <small>Defensive SOC Platform</small>
+                    </div>
+                </a>
             </div>
-        </div>
-        <nav class="site-nav" aria-label="Primary navigation">
-            <div class="container site-nav-content">
-                <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
-                <a href="{{ url_for('main.dashboard') }}#applications">Applications</a>
-                <a href="{{ url_for('main.dashboard') }}#events">Security Events</a>
-                <a href="{{ url_for('main.dashboard') }}#incidents">Incidents</a>
-                <a href="{{ url_for('main.index') }}">Input Analysis</a>
+
+            <div class="sidebar-status-box">
+                <div class="status-indicator">
+                    <span class="status-pulse-dot" aria-hidden="true"></span>
+                    <span class="status-title">Monitoring Active</span>
+                </div>
+                <span class="status-sub">Prototype Environment</span>
             </div>
-        </nav>
-    </header>
 
-    <main>
-        {% block content %}{% endblock %}
-    </main>
+            <nav class="sidebar-nav" aria-label="Primary navigation">
+                <div class="nav-group-title">OPERATIONS &amp; SOC</div>
+                <ul class="nav-list">
+                    <li>
+                        <a href="{{ url_for('main.dashboard') }}" class="nav-item {% if request.endpoint == 'main.dashboard' and not request.query_string %}active{% endif %}">
+                            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('main.dashboard') }}#events" class="nav-item">
+                            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            <span>Security Events</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('main.dashboard') }}#incidents" class="nav-item">
+                            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                            <span>Incidents</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('main.dashboard') }}#behavior" class="nav-item">
+                            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+                            <span>Behavioral Intel</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('main.dashboard') }}#applications" class="nav-item">
+                            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+                            <span>Applications</span>
+                        </a>
+                    </li>
+                </ul>
 
-    <footer class="site-footer">
-        <div class="container">
-            <p>XShield &middot; Built for responsible security learning</p>
+                <div class="nav-group-title">SECURITY TOOLS</div>
+                <ul class="nav-list">
+                    <li>
+                        <a href="{{ url_for('main.index') }}" class="nav-item {% if request.endpoint == 'main.index' %}active{% endif %}">
+                            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            <span>Input Analysis</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('main.health_check') }}" target="_blank" rel="noopener" class="nav-item">
+                            <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                            <span>API Health</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-telemetry">
+                <div class="telemetry-label">SECURITY ENGINE</div>
+                <div class="telemetry-row">
+                    <span>Engine Type</span>
+                    <strong>Hybrid (Rule + ML)</strong>
+                </div>
+                <div class="telemetry-row">
+                    <span>Baseline Model</span>
+                    <strong>TF-IDF + Logistic Reg</strong>
+                </div>
+                <div class="telemetry-row">
+                    <span>Policy Mode</span>
+                    <strong>Fail-Closed</strong>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Workspace Area -->
+        <div class="app-main">
+            <!-- Topbar Header -->
+            <header class="app-topbar">
+                <div class="topbar-left">
+                    <button class="mobile-menu-btn" id="mobile-menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                    </button>
+                    <div class="topbar-breadcrumbs">
+                        <span class="crumb-root">XShield</span>
+                        <span class="crumb-separator">/</span>
+                        <span class="crumb-current">{% block page_title %}Security Operations{% endblock %}</span>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <div class="topbar-badge badge-active">
+                        <span class="pulse-dot" aria-hidden="true"></span>
+                        <span>Nominal</span>
+                    </div>
+                    <div class="topbar-badge badge-proto">
+                        <span>Local Prototype</span>
+                    </div>
+                    <a href="{{ url_for('main.index') }}" class="btn-quick-action" title="Submit sample input for security analysis">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        <span>Analyze Input</span>
+                    </a>
+                </div>
+            </header>
+
+            <!-- Main Page Content Block -->
+            <main class="app-content-body">
+                {% block content %}{% endblock %}
+            </main>
+
+            <!-- Footer -->
+            <footer class="app-footer">
+                <div class="footer-left">
+                    <strong>XShield</strong> &middot; AI/ML-Based XSS Attack Detection &amp; Risk Assessment Platform
+                </div>
+                <div class="footer-right">
+                    <span>Defensive Cybersecurity Prototype</span>
+                    <span class="footer-sep">&bull;</span>
+                    <span>Explainable Hybrid Intelligence</span>
+                </div>
+            </footer>
         </div>
-    </footer>
+    </div>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>

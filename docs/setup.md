@@ -95,13 +95,13 @@ The earlier ML-only evaluation is also available:
 
 ## Application Startup
 
-Set credentials before starting if the dashboard is needed:
+Start the application:
 
 ```powershell
-$env:XSHIELD_DASHBOARD_USERNAME = "admin"
-$env:XSHIELD_DASHBOARD_PASSWORD = "choose-a-local-password"
 .\.venv\Scripts\python.exe -m app
 ```
+
+> **Note:** XShield console is unauthenticated in local demonstration mode. API ingestion remains authenticated using X-API-Key.
 
 The default entry point runs Flask with debug disabled. Set
 `XSHIELD_DEBUG=true` only for intentional local debugging.
@@ -112,9 +112,7 @@ Open:
 - <http://127.0.0.1:5000/health>
 - <http://127.0.0.1:5000/dashboard>
 
-The dashboard uses HTTP Basic Authentication. If the password is missing, it
-returns 503 instead of exposing stored events. HTTP Basic Authentication is
-not a substitute for HTTPS or production identity management.
+The unauthenticated console is intended specifically for local development and controlled demonstration. It is not designed or represented as a production-secure deployment configuration. API endpoints (`POST /api/v1/events`) continue to strictly require valid `X-API-Key` headers.
 
 ## Test Execution
 

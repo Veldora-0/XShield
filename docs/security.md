@@ -118,21 +118,13 @@ generic analysis failure and stores no event. It never reports an unanalysed
 event as `allow`. Persistence errors also use generic responses without
 database details or API-key values.
 
-## Dashboard Access Control
+## Console Access & API Ingestion Authentication
 
-`/dashboard` and `/dashboard/event/<id>` require HTTP Basic Authentication.
-Credentials are configured with:
+XShield console is unauthenticated in local demonstration mode. API ingestion remains authenticated using X-API-Key.
 
-```powershell
-$env:XSHIELD_DASHBOARD_USERNAME = "admin"
-$env:XSHIELD_DASHBOARD_PASSWORD = "choose-a-local-password"
-```
+The Security Operations Console (`/dashboard` and its subroutes `/dashboard/events`, `/dashboard/incidents`, `/dashboard/behavior`, `/dashboard/applications`, `/dashboard/event/<id>`) is directly accessible locally without credentials to support frictionless local exploration and controlled demonstration. This unauthenticated console configuration is intended strictly for local development and demonstration; it is not designed or represented as a production-secure deployment model. Production deployment would require HTTPS/TLS, secret storage and rotation, robust identity and access management (IAM), multi-factor authentication, role-based access control (RBAC), auditing, and secure session management.
 
-Missing password configuration fails closed with 503. Invalid credentials
-return 401 with a Basic-authentication challenge. This is a minimal local
-prototype control. Production use requires HTTPS/TLS, secret storage and
-rotation, stronger identity and authorization, roles, auditing, and session
-design.
+In contrast, the external telemetry ingestion API (`POST /api/v1/events`) strictly enforces authentication via the `X-API-Key` request header. API keys are validated using one-way cryptographic SHA-256 hashes against stored active keys, ensuring that API-key authentication, tenant isolation, and application scoping remain fully protected and enforced.
 
 The dashboard displays only API-key status and counts. Plaintext API keys,
 key hashes, raw request payloads, and secret values are not included in its
