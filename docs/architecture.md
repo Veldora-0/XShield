@@ -161,6 +161,12 @@ HTTP Basic Authentication
 `GET /dashboard/event/<id>` uses the same access-control decorator and returns
 a 404 template when the numeric event ID does not exist.
 
+The dashboard assembles a bounded snapshot through
+`app.services.dashboard.get_dashboard_snapshot`. It reuses existing event,
+application, and API-key metadata queries, never returns plaintext keys, and
+derives Phase 6 behavioral context and Phase 7 incidents in memory. Incident
+results remain dynamic and are not persisted by the dashboard.
+
 ## 8. Security Boundaries
 
 - User input is data and is never executed.

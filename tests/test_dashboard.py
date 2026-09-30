@@ -154,6 +154,28 @@ class DashboardTests(unittest.TestCase):
         self.assertEqual(response.status_code, 503)
         self.assertIn(b"Dashboard access is not configured", response.data)
 
+    def test_dashboard_shows_applications_and_safe_operational_context(self):
+        create_security_event(event("High", 70, "block"), self.database_path)
+
+        response = self.client.get("/dashboard", headers=self.dashboard_headers)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Registered apps", response.data)
+        self.assertIn(b"Legacy Local Application", response.data)
+        self.assertIn(b"Observed signals", response.data)
+        self.assertIn(b"browser_analysis", response.data)
+        self.assertNotIn(b"xsh_", response.data)
+
+    def test_dashboard_handles_optional_event_metadata(self):
+        created = event("Medium", 40, "flag")
+        created["application_id"] = 1
+        create_security_event(created, self.database_path)
+
+        response = self.client.get("/dashboard", headers=self.dashboard_headers)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"browser_analysis", response.data)
+
 
 if __name__ == "__main__":
     unittest.main()

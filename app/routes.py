@@ -3,8 +3,12 @@ import hmac
 
 from flask import Blueprint, current_app, jsonify, render_template, request
 
-from app.database import get_dashboard_stats, get_event_by_id, get_filtered_events
-from app.services import analyze_security_input, log_security_event
+from app.database import get_event_by_id
+from app.services import (
+    analyze_security_input,
+    get_dashboard_snapshot,
+    log_security_event,
+)
 from app.validation import validate_input
 
 
@@ -87,7 +91,7 @@ def dashboard():
     risk_level = request.args.get("risk_level") or None
     action = request.args.get("action") or None
     search = request.args.get("search", "").strip()
-    events = get_filtered_events(
+    snapshot = get_dashboard_snapshot(
         limit=50,
         risk_level=risk_level,
         action=action,
@@ -96,8 +100,7 @@ def dashboard():
     )
     return render_template(
         "dashboard.html",
-        stats=get_dashboard_stats(current_app.config["DATABASE_PATH"]),
-        events=events,
+        **snapshot,
         selected_risk=risk_level or "All",
         selected_action=action or "All",
         search=search,

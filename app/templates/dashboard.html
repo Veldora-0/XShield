@@ -1,101 +1,139 @@
 {% extends "base.html" %}
 
-{% block title %}XShield | Security Dashboard{% endblock %}
+{% block title %}XShield | Security Operations{% endblock %}
 
 {% block content %}
-<section class="workspace-section dashboard-section">
+<section class="dashboard-section">
     <div class="container">
-        <div class="section-heading dashboard-heading">
-            <p class="eyebrow">SECURITY MONITORING</p>
-            <h1>XShield Security Dashboard</h1>
-            <p>Monitoring data comes from stored SQLite security events. This page contains no detection logic.</p>
+        <div class="dashboard-hero">
+            <div>
+                <p class="eyebrow">SECURITY OPERATIONS</p>
+                <h1>Operational security overview</h1>
+                <p class="dashboard-intro">A bounded view of observed application activity, detection outcomes, and explainable incident context.</p>
+            </div>
+            <div class="dashboard-state">
+                <span class="status-dot" aria-hidden="true"></span>
+                Monitoring active
+                <small>Local prototype environment</small>
+            </div>
         </div>
 
         <div class="dashboard-cards">
-            <div class="dashboard-card"><span class="summary-label">TOTAL EVENTS</span><strong>{{ stats.total_events }}</strong></div>
-            <div class="dashboard-card"><span class="summary-label">LOW RISK</span><strong>{{ stats.risk_counts.Low }}</strong></div>
-            <div class="dashboard-card"><span class="summary-label">MEDIUM RISK</span><strong>{{ stats.risk_counts.Medium }}</strong></div>
-            <div class="dashboard-card"><span class="summary-label">HIGH RISK</span><strong>{{ stats.risk_counts.High }}</strong></div>
-            <div class="dashboard-card"><span class="summary-label">CRITICAL</span><strong>{{ stats.risk_counts.Critical }}</strong></div>
-            <div class="dashboard-card"><span class="summary-label">BLOCKED</span><strong>{{ stats.blocked_events }}</strong></div>
+            <div class="dashboard-card"><span class="summary-label">TOTAL EVENTS</span><strong>{{ stats.total_events }}</strong><small>Stored observations</small></div>
+            <div class="dashboard-card"><span class="summary-label">HIGH RISK</span><strong class="risk-high">{{ stats.risk_counts.High }}</strong><small>High severity events</small></div>
+            <div class="dashboard-card"><span class="summary-label">CRITICAL</span><strong class="risk-critical">{{ stats.risk_counts.Critical }}</strong><small>Critical severity events</small></div>
+            <div class="dashboard-card"><span class="summary-label">BLOCKED</span><strong>{{ stats.blocked_events }}</strong><small>Application-level actions</small></div>
+            <div class="dashboard-card"><span class="summary-label">APPLICATIONS</span><strong>{{ stats.application_count }}</strong><small>Registered applications</small></div>
         </div>
 
-        <div class="dashboard-panel">
-            <div class="panel-heading">
-                <div>
-                    <p class="eyebrow">RISK DISTRIBUTION</p>
-                    <h2>Stored event levels</h2>
-                </div>
-            </div>
-            {% if stats.total_events %}
-            <div class="risk-bars">
-                {% for level in ("Low", "Medium", "High", "Critical") %}
-                {% set count = stats.risk_counts[level] %}
-                <div class="risk-bar-row">
-                    <span>{{ level }}</span>
-                    <div class="risk-bar-track"><div class="risk-bar risk-{{ level|lower }}" style="width: {{ ((count / stats.total_events) * 100)|round(2) }}%"></div></div>
-                    <strong>{{ count }}</strong>
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <p class="empty-state">No security events recorded yet.</p>
-            {% endif %}
-        </div>
+        <div class="dashboard-layout">
+            <div>
+                <section class="dashboard-panel" id="events">
+                    <div class="panel-heading">
+                        <div>
+                            <p class="eyebrow">EVENT REVIEW</p>
+                            <h2>Recent security events</h2>
+                        </div>
+                        <span class="panel-meta">Latest {{ event_limit }}</span>
+                    </div>
+                    <form class="dashboard-filters" method="get" action="{{ url_for('main.dashboard') }}">
+                        <label>Risk level
+                            <select name="risk_level">
+                                {% for level in ("All", "Low", "Medium", "High", "Critical") %}
+                                <option value="{{ level }}" {% if selected_risk == level %}selected{% endif %}>{{ level }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                        <label>Action
+                            <select name="action">
+                                {% for value, label in (("All", "All"), ("allow", "Allow"), ("flag", "Monitor"), ("block", "Block"), ("block_and_alert", "Block + Alert")) %}
+                                <option value="{{ value }}" {% if selected_action == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                        <label>Search
+                            <input type="search" name="search" value="{{ search }}" maxlength="100" placeholder="Input, ML label, agreement">
+                        </label>
+                        <button class="primary-button filter-button" type="submit">Apply filters</button>
+                    </form>
+                    {% if events %}
+                    <div class="table-wrapper">
+                        <table class="events-table">
+                            <thead><tr><th>Event</th><th>Time</th><th>Application</th><th>Type / endpoint</th><th>Risk</th><th>Action</th><th>Detection</th></tr></thead>
+                            <tbody>
+                            {% for event in events %}
+                            <tr>
+                                <td><a href="{{ url_for('main.dashboard_event', event_id=event.id) }}">#{{ event.id }}</a></td>
+                                <td>{{ event.timestamp }}</td>
+                                <td>{{ event.application_name }}</td>
+                                <td><strong>{{ event.event_type or "browser_analysis" }}</strong><small class="table-subtext">{{ event.endpoint or "Local input" }}</small></td>
+                                <td><span class="badge risk-badge risk-{{ event.risk_level|lower }}">{{ event.risk_level }}</span></td>
+                                <td><span class="badge action-{{ event.action|replace("_", "-") }}">{{ event.action|replace("_", " ") }}</span></td>
+                                <td><strong>{{ event.ml_prediction }}</strong><small class="table-subtext">{{ event.detector_agreement }}</small></td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="empty-state">{% if selected_risk != "All" or selected_action != "All" or search %}No matching security events.{% else %}No security events recorded yet.{% endif %}</p>
+                    {% endif %}
+                </section>
 
-        <div class="dashboard-panel">
-            <div class="panel-heading">
-                <div>
-                    <p class="eyebrow">EVENT REVIEW</p>
-                    <h2>Recent security events</h2>
-                </div>
-            </div>
-            <form class="dashboard-filters" method="get" action="{{ url_for('main.dashboard') }}">
-                <label>
-                    Risk level
-                    <select name="risk_level">
-                        {% for level in ("All", "Low", "Medium", "High", "Critical") %}
-                        <option value="{{ level }}" {% if selected_risk == level %}selected{% endif %}>{{ level }}</option>
+                <section class="dashboard-panel" id="incidents">
+                    <div class="panel-heading">
+                        <div>
+                            <p class="eyebrow">INCIDENT CORRELATION</p>
+                            <h2>Recent incidents</h2>
+                        </div>
+                        <span class="panel-meta">Derived, not persisted</span>
+                    </div>
+                    {% if incidents %}
+                    <div class="incident-list">
+                        {% for incident in incidents %}
+                        <article class="incident-row">
+                            <div class="incident-main">
+                                <div class="incident-title"><code>{{ incident.incident_id }}</code><span class="badge risk-badge risk-{{ incident.risk_level|lower }}">{{ incident.risk_level }}</span></div>
+                                <strong>{{ incident.application_name }}</strong>
+                                <span class="table-subtext">{{ incident.event_count }} event{{ "" if incident.event_count == 1 else "s" }} &middot; {{ incident.correlation_reasons|join("; ") }}</span>
+                            </div>
+                            <div class="incident-times"><span>{{ incident.started_at }}</span><span>Latest {{ incident.latest_event_at }}</span></div>
+                        </article>
                         {% endfor %}
-                    </select>
-                </label>
-                <label>
-                    Action
-                    <select name="action">
-                        {% for value, label in (("All", "All"), ("allow", "Allow"), ("flag", "Flag"), ("block", "Block"), ("block_and_alert", "Block + Alert")) %}
-                        <option value="{{ value }}" {% if selected_action == value %}selected{% endif %}>{{ label }}</option>
-                        {% endfor %}
-                    </select>
-                </label>
-                <label>
-                    Search
-                    <input type="search" name="search" value="{{ search }}" maxlength="100" placeholder="Input, ML label, agreement">
-                </label>
-                <button class="primary-button filter-button" type="submit">Apply filters</button>
-            </form>
-            {% if events %}
-            <div class="table-wrapper">
-                <table class="events-table">
-                    <thead><tr><th>ID</th><th>Timestamp</th><th>Risk</th><th>Score</th><th>ML</th><th>Probability</th><th>Action</th><th>Agreement</th></tr></thead>
-                    <tbody>
-                    {% for event in events %}
-                    <tr>
-                        <td><a href="{{ url_for('main.dashboard_event', event_id=event.id) }}">#{{ event.id }}</a></td>
-                        <td>{{ event.timestamp }}</td>
-                        <td><span class="risk-label risk-{{ event.risk_level|lower }}">{{ event.risk_level }}</span></td>
-                        <td>{{ "%.2f"|format(event.risk_score) }}</td>
-                        <td>{{ event.ml_prediction }}</td>
-                        <td>{{ "%.4f"|format(event.ml_probability) }}</td>
-                        <td>{{ event.action }}</td>
-                        <td>{{ event.detector_agreement }}</td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                    </div>
+                    {% else %}
+                    <p class="empty-state">No incidents derived from the bounded event history.</p>
+                    {% endif %}
+                </section>
             </div>
-            {% else %}
-            <p class="empty-state">No matching security events.</p>
-            {% endif %}
+
+            <aside class="dashboard-rail">
+                <section class="dashboard-panel behavior-panel">
+                    <p class="eyebrow">BEHAVIORAL CONTEXT</p>
+                    <h2>Observed signals</h2>
+                    <div class="behavior-score"><strong>{{ behavior.behavioral_score }}</strong><span>/ 100 heuristic score</span></div>
+                    <div class="signal-list">
+                        {% for label, key in (("Repeated activity", "repeated_activity"), ("Endpoint targeting", "endpoint_repetition"), ("Event burst", "burst_activity"), ("Pattern diversity", "pattern_diversity")) %}
+                        <div class="signal-row"><span>{{ label }}</span><strong class="{{ 'signal-on' if behavior[key] else 'signal-off' }}">{{ "Detected" if behavior[key] else "Clear" }}</strong></div>
+                        {% endfor %}
+                    </div>
+                    <p class="rail-note">Signals are bounded project heuristics based on observed events, not proof of attacker identity.</p>
+                </section>
+
+                <section class="dashboard-panel" id="applications">
+                    <div class="panel-heading"><div><p class="eyebrow">APPLICATIONS</p><h2>Registered apps</h2></div></div>
+                    {% if applications %}
+                    <div class="application-list">
+                        {% for application in applications %}
+                        <div class="application-row">
+                            <div><strong>{{ application.name }}</strong><span class="table-subtext">{{ application.slug }}</span></div>
+                            <div class="application-meta"><span class="status-{{ application.status }}">{{ application.status }}</span><small>{{ application.active_api_key_count }} active key{{ "" if application.active_api_key_count == 1 else "s" }}</small></div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}<p class="empty-state">No applications registered.</p>{% endif %}
+                </section>
+            </aside>
         </div>
     </div>
 </section>

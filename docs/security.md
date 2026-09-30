@@ -134,6 +134,13 @@ prototype control. Production use requires HTTPS/TLS, secret storage and
 rotation, stronger identity and authorization, roles, auditing, and session
 design.
 
+The dashboard displays only API-key status and counts. Plaintext API keys,
+key hashes, raw request payloads, and secret values are not included in its
+snapshot. Event and application values are rendered through escaped Jinja
+templates. The Phase 6 behavioral and Phase 7 incident sections consume
+bounded, application-scoped service results without changing detection or
+response decisions.
+
 ## Flask and Browser Controls
 
 Debug mode is disabled by default. Responses include:
