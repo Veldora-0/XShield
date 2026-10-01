@@ -61,13 +61,13 @@ the result page.
 ## 3. ML Pipeline
 
 ```text
-data/processed/xss_train.csv
+data/processed/xss_train_final.csv (24,327 verified samples)
               |
               v
      Character TF-IDF fit
               |
               v
-     54,919 sparse features
+     88,828 sparse features
               |
               v
    LogisticRegression(class_weight=balanced)

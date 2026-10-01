@@ -1,6 +1,6 @@
 {
   "dataset": {
-    "test_file": "data/processed/xss_test.csv",
+    "test_file": "D:\\XShield\\data\\processed\\xss_test.csv",
     "samples": 3967,
     "text_column": "text",
     "label_column": "label",
@@ -15,8 +15,8 @@
   },
   "model": {
     "name": "LogisticRegression",
-    "model_file": "models/xss_logistic_regression.joblib",
-    "vectorizer_file": "models/xss_tfidf_vectorizer.joblib",
+    "model_file": "D:\\XShield\\models\\xss_logistic_regression.joblib",
+    "vectorizer_file": "D:\\XShield\\models\\xss_tfidf_vectorizer.joblib",
     "vectorizer": {
       "analyzer": "char",
       "ngram_range": [
@@ -25,14 +25,14 @@
       ],
       "min_df": 2,
       "sublinear_tf": true,
-      "features": 54919
+      "features": 88828
     }
   },
   "metrics": {
-    "accuracy": 0.9989916813713133,
+    "accuracy": 0.999243761028485,
     "precision_xss": 1.0,
-    "recall_xss": 0.9622641509433962,
-    "f1_xss": 0.9807692307692307
+    "recall_xss": 0.9716981132075472,
+    "f1_xss": 0.9856459330143541
   },
   "confusion_matrix": {
     "labels": [
@@ -45,43 +45,37 @@
         0
       ],
       [
-        4,
-        102
+        3,
+        103
       ]
     ],
     "true_negative": 3861,
     "false_positive": 0,
-    "false_negative": 4,
-    "true_positive": 102
+    "false_negative": 3,
+    "true_positive": 103
   },
   "misclassifications": {
     "false_positive_count": 0,
-    "false_negative_count": 4,
+    "false_negative_count": 3,
     "representative_false_positives": [],
     "representative_false_negatives": [
-      {
-        "text": "prompt(1);>",
-        "actual_label": 1,
-        "predicted_label": 0,
-        "xss_probability": 0.4914574449913686
-      },
       {
         "text": "<?xml:namespace prefix=\"t\" ns=\"urn:schemas-microsoft-com:time\">",
         "actual_label": 1,
         "predicted_label": 0,
-        "xss_probability": 0.06771976008014946
+        "xss_probability": 0.16016884383453414
       },
       {
         "text": "x:expression8write(1)9>",
         "actual_label": 1,
         "predicted_label": 0,
-        "xss_probability": 0.2689415697119696
+        "xss_probability": 0.33301854074049453
       },
       {
         "text": "a=\"get\";",
         "actual_label": 1,
         "predicted_label": 0,
-        "xss_probability": 0.04458214457986242
+        "xss_probability": 0.07466536646912875
       }
     ]
   },

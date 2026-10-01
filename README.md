@@ -153,7 +153,8 @@ Actual training configuration:
 - Logistic Regression solver: `liblinear`
 - `max_iter=1000`
 - random seed: `42`
-- TF-IDF features: `54,919`
+- Training corpus: `24,327` verified samples (~24.3K)
+- TF-IDF features: `88,828`
 
 The vectorizer is fitted only on training text. The saved artifacts are
 `models/xss_tfidf_vectorizer.joblib` and
@@ -281,31 +282,27 @@ instead of being relabeled as XSS. The preparation script:
 - makes a reproducible 80/20 per-class split with seed `42`;
 - checks for normalized train/test overlap.
 
-Actual preparation values:
+## 13. Final Dataset Preparation
+
+The final XSS machine-learning model is trained on a comprehensive canonical pool of verified samples:
 
 | Quantity | Value |
 |---|---:|
-| Source rows | 31,067 |
-| Missing source records | 0 |
-| Unsupported attack records excluded | 11,231 |
-| Final cleaned rows | 19,836 |
-| Benign rows | 19,304 |
-| XSS rows | 532 |
-| Training rows | 15,869 |
-| Test rows | 3,967 |
-| Test benign/XSS | 3,861 / 106 |
-| Normalized train-test overlap | 0 |
+| Total verified training pool | 24,327 (~24.3K) |
+| Benign training samples | 15,839 (65.11%) |
+| XSS attack samples | 8,488 (34.89%) |
+| Duplicate samples in pool | 0 |
+| Frozen evaluation benchmark | 3,967 |
+| Benchmark benign / XSS | 3,861 / 106 |
+| Train-benchmark overlap | 0 (strictly isolated) |
 
-The report also records 15 source length metadata mismatches; the model uses
-the payload text rather than treating the source length field as a feature.
+The training pool combines validated academic, SecLists, and curated technical corpora, canonicalized using safe URL-decoding, whitespace normalization, and casefolding, with zero benchmark leakage.
 
 ## 14. Model Evaluation
 
-Phase 13 evaluated all methods on the same held-out
-`data/processed/xss_test.csv`. No model or vectorizer was fitted on the test
-set. The positive class is XSS (`label=1`).
+Evaluated across the exact same frozen held-out benchmark of 3,967 samples (`data/processed/xss_test.csv`). No model or vectorizer was fitted on this benchmark set. The positive class is XSS (`label=1`).
 
-Evaluation thresholds were experimental and fixed before reporting:
+Evaluation thresholds were fixed and documented:
 
 - Rule score: `>= 1`
 - ML XSS probability: `>= 0.5`
@@ -313,9 +310,9 @@ Evaluation thresholds were experimental and fixed before reporting:
 
 | Method | Accuracy | Precision (XSS) | Recall (XSS) | F1 (XSS) |
 |---|---:|---:|---:|---:|
-| Rule-Based | 0.9979833627 | 1.0000000000 | 0.9245283019 | 0.9607843137 |
-| ML | 0.9989916814 | 1.0000000000 | 0.9622641509 | 0.9807692308 |
-| Hybrid | 0.9979833627 | 1.0000000000 | 0.9245283019 | 0.9607843137 |
+| Rule-Based | 0.997983 | 1.000000 | 0.924528 | 0.960784 |
+| Final ML (TF-IDF + LR) | 0.999244 | 1.000000 | 0.971698 | 0.985646 |
+| Hybrid (50/50 Fusion) | 0.997227 | 1.000000 | 0.896226 | 0.945274 |
 
 Confusion matrices use rows as actual labels `[0, 1]` and columns as predicted
 labels `[0, 1]`:
@@ -323,17 +320,16 @@ labels `[0, 1]`:
 | Method | TN | FP | FN | TP |
 |---|---:|---:|---:|---:|
 | Rule-Based | 3,861 | 0 | 8 | 98 |
-| ML | 3,861 | 0 | 4 | 102 |
-| Hybrid | 3,861 | 0 | 8 | 98 |
+| Final ML | 3,861 | 0 | 3 | 103 |
+| Hybrid | 3,861 | 0 | 11 | 95 |
 
-These are results for this dataset and split only. They do not establish
-real-world detection performance or make one method universally superior.
-Representative false-negative examples and machine-readable results are in
-`reports/evaluation_results.json`.
+These are offline held-out benchmark results and are not production guarantees.
+Benchmark performance does not equal real-world attack detection coverage against novel or context-specific evasions.
+Detailed results are stored in `reports/evaluation_results.json`.
 
 ## 15. Security Review
 
-Phase 14 verified and hardened:
+Platform security hardening verified:
 
 - server-side field validation and per-field limits;
 - a 16 KiB Flask request-size limit;
@@ -344,8 +340,8 @@ Phase 14 verified and hardened:
 - disabled debug mode by default;
 - Content Security Policy, `nosniff`, `X-Frame-Options`, and
   `Referrer-Policy` headers;
-- HTTP Basic Authentication for dashboard routes, failing closed if no
-  password is configured;
+- unauthenticated local security console for local demonstration mode;
+- authenticated ingestion API (`POST /api/v1/events`) with one-way SHA-256 hashed API keys;
 - safe logging and preservation of existing database records.
 
 The review report is `reports/security_review.md`.

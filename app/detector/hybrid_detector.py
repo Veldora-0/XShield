@@ -43,13 +43,7 @@ def detect_text(
 
     normalized_rule_score = max(0.0, min(1.0, rule_result["score"] / 100))
     ml_score = max(0.0, min(1.0, float(ml_result["probability"])))
-    hybrid_signal = max(
-        0.0,
-        min(
-            1.0,
-            (rule_weight * normalized_rule_score) + (ml_weight * ml_score),
-        ),
-    )
+    hybrid_signal = max(normalized_rule_score, ml_score)
 
     return {
         "rule_result": rule_result,

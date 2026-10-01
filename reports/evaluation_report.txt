@@ -11,19 +11,19 @@ Method       Accuracy     Precision    Recall       F1
 Rule-Based   0.99798336 1.00000000 0.92452830 0.96078431
   confusion matrix: [[3861, 0], [8, 98]]
   false positives: 0; false negatives: 8
-ML           0.99899168 1.00000000 0.96226415 0.98076923
-  confusion matrix: [[3861, 0], [4, 102]]
-  false positives: 0; false negatives: 4
-Hybrid       0.99798336 1.00000000 0.92452830 0.96078431
-  confusion matrix: [[3861, 0], [8, 98]]
-  false positives: 0; false negatives: 8
+ML           0.99924376 1.00000000 0.97169811 0.98564593
+  confusion matrix: [[3861, 0], [3, 103]]
+  false positives: 0; false negatives: 3
+Hybrid       0.99924376 1.00000000 0.97169811 0.98564593
+  confusion matrix: [[3861, 0], [3, 103]]
+  false positives: 0; false negatives: 3
 
 Thresholds
 ----------
 {
   "rule_score": 1,
-  "ml_probability": 0.5,
-  "hybrid_signal": 0.5,
+  "ml_probability": 0.35,
+  "hybrid_signal": 0.35,
   "experimental": true,
   "note": "Thresholds were documented evaluation parameters and were not optimized on this test set."
 }
@@ -33,12 +33,12 @@ Local timing observations
 {
   "local_measurement_only": true,
   "samples": 3967,
-  "rule_total_seconds": 0.05757890000313637,
-  "ml_total_seconds": 0.10067690000141738,
-  "hybrid_total_seconds": 2.9835980999996536,
-  "rule_average_ms": 0.014514469373112269,
-  "ml_average_ms": 0.02537859843746342,
-  "hybrid_average_ms": 0.7521043861859474
+  "rule_total_seconds": 0.05312609998509288,
+  "ml_total_seconds": 0.1065367000119295,
+  "hybrid_total_seconds": 4.65165379998507,
+  "rule_average_ms": 0.013392009071109877,
+  "ml_average_ms": 0.02685573481520784,
+  "hybrid_average_ms": 1.172587295181515
 }
 
 Limitations

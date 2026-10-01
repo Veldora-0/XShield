@@ -9,8 +9,13 @@
             <span class="section-eyebrow">REPRODUCIBLE EVALUATION</span>
             <h1 class="page-title">Offline Benchmark Results</h1>
             <p class="page-lead">
-                Comparative evaluation of Rule-Based, Machine Learning, and Hybrid detection pipelines evaluated on the identical held-out test split of 3,967 samples from the HttpParamsDataset.
+                Reproducible evaluation of XShield's final XSS detection model and deterministic rule/hybrid pipelines on a separate held-out benchmark.
             </p>
+            <div class="benchmark-provenance-badge">
+                <span><strong>Final ML Model:</strong> Trained on 24,327 verified samples (~24.3K)</span>
+                <span class="badge-separator">&bull;</span>
+                <span><strong>Evaluation benchmark:</strong> 3,967 samples (3,861 benign, 106 XSS)</span>
+            </div>
         </div>
     </section>
 
@@ -19,9 +24,9 @@
         <div class="product-container">
             <div class="benchmark-metrics-grid">
                 <div class="benchmark-metric-card">
-                    <span class="benchmark-label">ML MODEL ACCURACY</span>
-                    <strong class="benchmark-val">99.90%</strong>
-                    <span class="benchmark-sub">0.99899 on held-out test set</span>
+                    <span class="benchmark-label">FINAL ML ACCURACY</span>
+                    <strong class="benchmark-val">99.92%</strong>
+                    <span class="benchmark-sub">0.99924 on held-out test set</span>
                 </div>
                 <div class="benchmark-metric-card">
                     <span class="benchmark-label">XSS PRECISION</span>
@@ -29,13 +34,13 @@
                     <span class="benchmark-sub">0 False Positives observed</span>
                 </div>
                 <div class="benchmark-metric-card">
-                    <span class="benchmark-label">ML RECALL</span>
-                    <strong class="benchmark-val">96.23%</strong>
-                    <span class="benchmark-sub">102 of 106 XSS identified</span>
+                    <span class="benchmark-label">FINAL ML RECALL</span>
+                    <strong class="benchmark-val">97.17%</strong>
+                    <span class="benchmark-sub">103 of 106 XSS identified</span>
                 </div>
                 <div class="benchmark-metric-card">
-                    <span class="benchmark-label">ML F1-SCORE</span>
-                    <strong class="benchmark-val">98.08%</strong>
+                    <span class="benchmark-label">FINAL ML F1-SCORE</span>
+                    <strong class="benchmark-val">98.56%</strong>
                     <span class="benchmark-sub">Harmonic mean of precision &amp; recall</span>
                 </div>
             </div>
@@ -74,27 +79,27 @@
                                 <td>96.08%</td>
                                 <td><span class="num-zero">0</span></td>
                                 <td>8</td>
-                                <td class="mono-sub">~0.015 ms</td>
+                                <td class="mono-sub">~0.025 ms</td>
                             </tr>
                             <tr class="highlight-row">
-                                <td><strong>Machine Learning (TF-IDF + LR)</strong></td>
-                                <td><strong class="score-accent">99.90%</strong></td>
+                                <td><strong>Final ML Detector (TF-IDF + LR)</strong></td>
+                                <td><strong class="score-accent">99.92%</strong></td>
                                 <td><strong class="score-accent">100.00%</strong></td>
-                                <td><strong class="score-accent">96.23%</strong></td>
-                                <td><strong class="score-accent">98.08%</strong></td>
+                                <td><strong class="score-accent">97.17%</strong></td>
+                                <td><strong class="score-accent">98.56%</strong></td>
                                 <td><span class="num-zero">0</span></td>
-                                <td>4</td>
-                                <td class="mono-sub">~0.025 ms</td>
+                                <td>3</td>
+                                <td class="mono-sub">~0.039 ms</td>
                             </tr>
                             <tr>
                                 <td><strong>Hybrid Detector (50/50 Fusion)</strong></td>
-                                <td>99.80%</td>
+                                <td>99.72%</td>
                                 <td>100.00%</td>
-                                <td>92.45%</td>
-                                <td>96.08%</td>
+                                <td>89.62%</td>
+                                <td>94.53%</td>
                                 <td><span class="num-zero">0</span></td>
-                                <td>8</td>
-                                <td class="mono-sub">~0.752 ms</td>
+                                <td>11</td>
+                                <td class="mono-sub">~1.657 ms</td>
                             </tr>
                         </tbody>
                     </table>
@@ -108,10 +113,10 @@
         <div class="product-container">
             <h2 class="section-heading">Detailed Confusion Matrices</h2>
             <div class="matrices-grid">
-                <!-- 1. ML Confusion Matrix -->
+                <!-- 1. Final ML Confusion Matrix -->
                 <div class="soc-card matrix-card">
                     <div class="matrix-card-header">
-                        <h4>Machine Learning Baseline (TF-IDF + LR)</h4>
+                        <h4>Final ML Detector (TF-IDF + LR)</h4>
                         <span class="matrix-threshold">Threshold: Probability &ge; 0.50</span>
                     </div>
                     <div class="matrix-table-wrap">
@@ -131,8 +136,8 @@
                                 </tr>
                                 <tr>
                                     <th>Actual XSS (1)</th>
-                                    <td class="cell-fn"><strong>4</strong><small>False Negative</small></td>
-                                    <td class="cell-tp"><strong>102</strong><small>True Positive</small></td>
+                                    <td class="cell-fn"><strong>3</strong><small>False Negative</small></td>
+                                    <td class="cell-tp"><strong>103</strong><small>True Positive</small></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -169,6 +174,49 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- 3. Hybrid Confusion Matrix -->
+                <div class="soc-card matrix-card">
+                    <div class="matrix-card-header">
+                        <h4>Hybrid Detector (50/50 Fusion)</h4>
+                        <span class="matrix-threshold">Threshold: Hybrid Signal &ge; 0.50</span>
+                    </div>
+                    <div class="matrix-table-wrap">
+                        <table class="matrix-table">
+                            <thead>
+                                <tr>
+                                    <th>Actual \ Predicted</th>
+                                    <th>Pred Benign (0)</th>
+                                    <th>Pred XSS (1)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>Actual Benign (0)</th>
+                                    <td class="cell-tn"><strong>3,861</strong><small>True Negative</small></td>
+                                    <td class="cell-fp"><strong>0</strong><small>False Positive</small></td>
+                                </tr>
+                                <tr>
+                                    <th>Actual XSS (1)</th>
+                                    <td class="cell-fn"><strong>11</strong><small>False Negative</small></td>
+                                    <td class="cell-tp"><strong>95</strong><small>True Positive</small></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hybrid Behavior Note -->
+    <section class="hybrid-note-section">
+        <div class="product-container">
+            <div class="soc-card hybrid-analysis-card">
+                <h3>Hybrid Detector Fusion Analysis</h3>
+                <p>
+                    The hybrid pipeline combines the heuristic score (50%) and the final ML probability (50%). On three payloads where the rule score was low (scores 20–40) despite triggering an alert, the combined linear signal fell just below the 0.50 decision threshold, resulting in 11 false negatives on this offline test set. This demonstrates the empirical trade-off of strict equal-weighted fusion without heuristic override logic.
+                </p>
             </div>
         </div>
     </section>
@@ -181,7 +229,7 @@
                 <div class="methodology-points">
                     <div class="method-item">
                         <strong>Held-Out Test Set Isolation</strong>
-                        <p>The held-out test split of 3,967 samples was never used to fit the TF-IDF vectorizer or Logistic Regression classifier. It was strictly isolated until offline model evaluation.</p>
+                        <p>The held-out test split of 3,967 samples was strictly isolated from training. Neither the TF-IDF vectorizer nor the Logistic Regression classifier was fitted on any sample from this evaluation benchmark.</p>
                     </div>
                     <div class="method-item">
                         <strong>Class Imbalance Context</strong>
@@ -189,7 +237,7 @@
                     </div>
                     <div class="method-item">
                         <strong>Important Research Disclaimer</strong>
-                        <p>These benchmark results apply specifically to the selected <code>HttpParamsDataset</code> held-out test split. <strong>They are not real-world guarantees of detecting 100% of all future, fragmented, or polymorphic XSS attacks.</strong> XShield is a defensive risk-assessment prototype and must be paired with trusted output encoding and web application firewalls in production.</p>
+                        <p><strong>These are offline held-out benchmark results and are not production guarantees.</strong> Benchmark performance does not equal real-world attack detection coverage against novel, fragmented, or polymorphic evasion techniques. XShield is designed as a defense-in-depth risk-assessment layer and must be paired with contextual output encoding, strict CSP headers, and web application firewalls in production.</p>
                     </div>
                 </div>
             </div>

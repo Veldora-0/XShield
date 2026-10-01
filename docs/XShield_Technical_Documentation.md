@@ -86,18 +86,15 @@ It maps `norm` to benign (`0`) and `xss` to XSS (`1`), removes unsupported
 categories, exact duplicates, normalized duplicate text, and invalid/blank
 records.
 
-The final dataset has 19,836 rows: 19,304 benign and 532 XSS. A reproducible
-80/20 per-class split with random seed 42 creates 15,869 training rows and
-3,967 test rows. The test set contains 3,861 benign and 106 XSS rows. No
-case-folded, whitespace-normalized text overlap was found across splits.
+The final machine-learning model is trained on a canonical pool of 24,327 verified samples (15,839 benign and 8,488 XSS). A strictly isolated, held-out evaluation benchmark of 3,967 samples (`data/processed/xss_test.csv`) contains 3,861 benign and 106 XSS rows. No case-folded, whitespace-normalized text overlap exists between the training pool and the frozen benchmark (0 contamination).
 
 ## ML Methodology
 
-The vectorizer is character-level TF-IDF with 3-5 character n-grams,
+The vectorizer is character-level TF-IDF with 3–5 character n-grams,
 `min_df=2`, and sublinear term frequency. It is fitted only on training text.
-The Logistic Regression baseline uses balanced class weights, the `liblinear`
+The Logistic Regression model uses balanced class weights, the `liblinear`
 solver, `max_iter=1000`, and random state 42. The fitted vectorizer produces
-54,919 features and is saved with the classifier using Joblib.
+88,828 features and is saved with the classifier using Joblib.
 
 Prediction returns the class label, `benign`/`xss` name, and XSS probability.
 Loading is restricted to fixed project paths; users cannot upload or select

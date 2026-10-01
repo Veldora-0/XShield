@@ -8,7 +8,9 @@ from sklearn.linear_model import LogisticRegression
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-TRAIN_PATH = PROJECT_ROOT / "data" / "processed" / "xss_train.csv"
+FINAL_TRAIN_PATH = PROJECT_ROOT / "data" / "processed" / "xss_train_final.csv"
+LEGACY_TRAIN_PATH = PROJECT_ROOT / "data" / "processed" / "xss_train.csv"
+TRAIN_PATH = FINAL_TRAIN_PATH if FINAL_TRAIN_PATH.exists() else LEGACY_TRAIN_PATH
 TEST_PATH = PROJECT_ROOT / "data" / "processed" / "xss_test.csv"
 MODELS_DIR = PROJECT_ROOT / "models"
 VECTORIZER_PATH = MODELS_DIR / "xss_tfidf_vectorizer.joblib"

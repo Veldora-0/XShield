@@ -1,7 +1,7 @@
 {
-  "training_samples": 15869,
+  "training_samples": 24327,
   "test_samples": 3967,
-  "tfidf_features": 54919,
+  "tfidf_features": 88828,
   "tfidf_configuration": {
     "analyzer": "char",
     "ngram_range": [
@@ -19,14 +19,14 @@
     "solver": "liblinear"
   },
   "training_class_counts": {
-    "0": 15443,
-    "1": 426
+    "0": 15839,
+    "1": 8488
   },
   "test_class_counts": {
     "0": 3861,
     "1": 106
   },
-  "saved_vectorizer": "models/xss_tfidf_vectorizer.joblib",
-  "saved_model": "models/xss_logistic_regression.joblib",
+  "saved_vectorizer": "D:\\XShield\\models\\xss_tfidf_vectorizer.joblib",
+  "saved_model": "D:\\XShield\\models\\xss_logistic_regression.joblib",
   "evaluation_metrics": "Not calculated in Phase 6."
 }

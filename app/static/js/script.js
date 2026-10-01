@@ -1,4 +1,39 @@
+// -----------------------------------------------------------------------
+// 0. Instant Theme Restoration (Prevents FOUC on page navigation)
+// -----------------------------------------------------------------------
+(function applyInitialTheme() {
+    try {
+        const savedTheme = localStorage.getItem("xshield-theme");
+        if (savedTheme === "light") {
+            document.documentElement.setAttribute("data-theme", "light");
+        } else {
+            document.documentElement.removeAttribute("data-theme");
+        }
+    } catch (e) {
+        // Fallback gracefully if localStorage access fails
+    }
+})();
+
 document.addEventListener("DOMContentLoaded", () => {
+    // -----------------------------------------------------------------------
+    // Theme Toggle Control (Public Header & Security Console Topbar)
+    // -----------------------------------------------------------------------
+    const themeToggleBtns = document.querySelectorAll(".theme-toggle-btn");
+    if (themeToggleBtns.length) {
+        themeToggleBtns.forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const isLight = document.documentElement.getAttribute("data-theme") === "light";
+                if (isLight) {
+                    document.documentElement.removeAttribute("data-theme");
+                    try { localStorage.setItem("xshield-theme", "dark"); } catch (e) {}
+                } else {
+                    document.documentElement.setAttribute("data-theme", "light");
+                    try { localStorage.setItem("xshield-theme", "light"); } catch (e) {}
+                }
+            });
+        });
+    }
+
     // -----------------------------------------------------------------------
     // 1. Authenticated Console Mobile Sidebar Toggle
     // -----------------------------------------------------------------------

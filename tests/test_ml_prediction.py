@@ -45,7 +45,7 @@ class MLPredictionTests(unittest.TestCase):
     def test_training_report_contains_actual_configuration(self):
         report = json.loads(REPORT_PATH.read_text(encoding="utf-8"))
 
-        self.assertEqual(report["training_samples"], 15869)
+        self.assertEqual(report["training_samples"], 24327)
         self.assertEqual(report["test_samples"], 3967)
         self.assertEqual(report["tfidf_configuration"]["fit_on"], "training text only")
         self.assertEqual(

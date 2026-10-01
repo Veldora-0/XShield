@@ -38,7 +38,7 @@ class HybridDetectorTests(unittest.TestCase):
         rule_detector.assert_called_once_with("test input")
         ml_detector.assert_called_once_with("test input")
         self.assertEqual(result["hybrid"]["agreement"], "both_suspicious")
-        self.assertAlmostEqual(result["hybrid"]["hybrid_signal"], 0.6)
+        self.assertAlmostEqual(result["hybrid"]["hybrid_signal"], 0.8)
 
     def test_agreement_states_are_based_on_actual_outputs(self):
         cases = [
