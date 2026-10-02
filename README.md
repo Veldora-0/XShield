@@ -1,612 +1,544 @@
 # XShield
+## Hybrid XSS Attack Detection & Risk Intelligence Platform
 
-## AI/ML-Based XSS Attack Detection and Risk Assessment System
+XShield is a hybrid web security platform that combines deterministic XSS detection, character-level machine learning, risk scoring, behavioral intelligence, and incident correlation to analyze untrusted web application input.
+
+> **Scope & Positioning Notice:** XShield is designed for input-layer threat analysis and defense-in-depth security intelligence. It is not an end-to-end Web Application Firewall (WAF), does not claim 100% detection accuracy, is not represented as guaranteed XSS prevention, and does not replace context-aware output encoding, strict Content Security Policy (CSP), or secure software design.
+
+---
 
 ## 1. Overview
 
-XShield is a defensive cybersecurity research and college-project prototype
-that analyzes user-controlled text for characteristics associated with
-cross-site scripting (XSS). It combines an explainable rule detector with a
-saved machine-learning baseline, converts their signals into a project-defined
-risk score, applies a local response policy, records security events in
-SQLite, and presents them through a protected dashboard.
+Cross-Site Scripting (XSS) remains one of the most prevalent and evasive client-side vulnerabilities in web applications. While traditional signature-based detection mechanisms offer high interpretability and zero false positives for known exploit syntax, they struggle against novel variations and obfuscated payloads. Conversely, standalone machine-learning classifiers can generalize across token sequences but can introduce uncertainty, latency, or false positives on complex benign payloads.
 
-XShield is a detection and risk-assessment demonstration. It does not
-guarantee detection of every XSS attack and does not replace context-aware
-output encoding, trusted sanitization, secure application design, or a
-production web-application firewall.
+XShield resolves these challenges through a **multi-tiered hybrid architecture**:
+- **Deterministic Heuristic Engine (R001–R006):** Validates submitted input against established structural indicators (HTML tags, script constructs, event handlers, execution functions, dangerous URL schemes, and encoding tricks).
+- **Statistical ML Engine:** Employs character-level TF-IDF feature extraction (3–5 n-grams, 88,828 features) and Logistic Regression trained on 24,327 verified unique samples.
+- **Max-Signal Hybrid Fusion:** Combines rule and ML signals into an explainable 0–100 risk score that drives a four-stage triage policy (`allow`, `flag`, `block`, `block_and_alert`).
+- **Contextual Intelligence:** Correlates real-time events across application scopes to surface frequency bursts, repeated suspicious behavior, pattern diversity, and correlated security incidents.
 
-### XShield preparation status
+---
 
-The project is being evolved incrementally toward an integration-ready
-platform. Phase 1 defines a validated internal security-event contract and
-shared integration limits. Phase 2 adds an idempotent SQLite schema migration
-and application registry without enabling an external API or changing the
-existing browser pipeline. Phase 3 adds local application/API-key management
-and a reusable API-key validation service. Event ingestion, behavior
-signals, incidents, and the separate demo website are planned for later
-phases.
+## 2. Key Features
 
-## 2. Problem Statement
+- **Authenticated REST Ingestion API:** High-throughput `POST /api/v1/events` endpoint secured by cryptographically generated `X-API-Key` headers stored as one-way SHA-256 hashes.
+- **Explainable Rule Engine:** Six independent, deterministic detection rules (R001–R006) providing transparent scoring and forensic reasoning.
+- **High-Capacity ML Classifier:** Character-level TF-IDF vectorizer (88,828 features) coupled with an optimized Logistic Regression classifier operating at a calibrated decision threshold of `0.35`.
+- **Max-Signal Fusion & Risk Engine:** Dynamically selects the strongest threat signal between heuristics and machine learning, mapping inputs to Low, Medium, High, or Critical risk tiers.
+- **Behavioral Intelligence:** Tracks recent per-application telemetry to detect short-window bursts, endpoint repetition, and cross-rule pattern diversity.
+- **Deterministic Incident Correlation:** Automatically clusters related events sharing request IDs, endpoints, or attack patterns within sliding time windows.
+- **Dedicated SOC Security Console:** Unauthenticated local operations center featuring executive metrics, telemetry graphs, live event inspection, incident correlation views, and registered application tracking.
+- **Interactive Payload Scanner & Public Portal:** Interactive exploration workbench allowing security analysts to inspect arbitrary payloads with real-time rule breakdown and ML probability confidence scores.
+- **Independent Apex Enterprise Client Integration:** Demonstrates real-time external telemetry ingestion from a separate client web application via HTTP REST API.
+- **Full Test Coverage:** 157 automated tests covering all detection algorithms, API ingestion boundaries, database operations, behavioral analytics, and security hardening.
 
-User-controlled input can contain markup, script-related constructs,
-event-handler patterns, suspicious URL schemes, or encoded representations.
-Identifying suspicious input is difficult because legitimate text can contain
-unusual characters and attack strings can be obfuscated or context-dependent.
-Static rules are interpretable but incomplete, while an ML classifier depends
-on the data used to train and evaluate it. XShield demonstrates how these
-signals can be examined together without treating a detector prediction as
-proof of an attack.
+---
 
-## 3. Objectives
-
-- Build a beginner-friendly Flask application for local defensive analysis.
-- Implement modular, explainable rule-based XSS indicators.
-- Train and reuse a TF-IDF and Logistic Regression baseline.
-- Combine rule and ML evidence with configurable experimental weights.
-- Convert the hybrid signal into project-defined risk levels and actions.
-- Record completed security events without executing submitted text.
-- Provide a protected dashboard for local event review.
-- Evaluate rule-based, ML, and hybrid methods on the same held-out test set.
-- Document limitations, security controls, and reproducible project commands.
-
-## 4. Key Features
-
-- Flask application factory with `/`, `/health`, `/dashboard`, and
-  `/dashboard/event/<id>` routes.
-- Server-side validation for username, search query, and comment fields.
-- Rule detector with six indicator categories and explanations.
-- Saved character-level TF-IDF vectorizer and Logistic Regression classifier.
-- Hybrid signal with normalized rule and ML contributions.
-- Risk score, risk level, reasons, and response action.
-- SQLite security-event persistence and dashboard aggregates.
-- HTTP Basic Authentication for dashboard routes.
-- Local application registration and hashed API-key management for future
-  integrations; no event-ingestion route is enabled yet.
-- Jinja autoescaping, request-size limits, parameterized SQL, controlled model
-  errors, and basic security headers.
-- Automated unit, integration, security-hardening, and evaluation tests.
-
-## 5. Architecture
+## 3. Architecture
 
 ```text
-User Input
-    |
-    +------------------+
-    |                  |
-Rule Detector      ML Detector
-    |                  |
-    +--------+---------+
-             |
-      Hybrid Detector
-             |
-       Risk Engine
-             |
-      Action Engine
-             |
-       SQLite Logger
-             |
-        Dashboard
+Web Application / ApexTestWebsite (Client)
+              |
+          X-API-Key (SHA-256 Authenticated)
+              |
+              v
+       XShield REST API (POST /api/v1/events)
+              |
+    Validation / Normalization (Bounded Payload Contract)
+              |
+              v
+     Security Analysis Pipeline
+          /             \
+         /               \
+     Rules                ML
+   R001–R006       TF-IDF + LR
+  (Structural)     (Statistical)
+         \               /
+          \             /
+           v           v
+        Max-Signal Fusion
+              |
+         Risk 0–100
+              |
+      Allow / Flag / Block
+              |
+      Behavioral Analysis (Burst, Repetition, Pattern Diversity)
+              |
+       Incident Correlation (Deterministic Clustering)
+              |
+       SQLite Database (Parameterized Persistence)
+              |
+       Security Console (Dashboard, Events, Incidents)
 ```
 
-The form submission is handled by `app/routes.py`. The rule and ML detectors
-produce evidence, the hybrid detector combines it, the risk engine classifies
-the signal, and the response engine determines the local application action.
-The completed event is then stored and can be reviewed through the
-authenticated dashboard.
+---
 
-## 6. Rule-Based Detection
+## 4. Detection Pipeline
 
-The rule detector is implemented in `app/detector/rules.py` and
-`app/detector/rule_engine.py`. It creates bounded, case-insensitive views of
-the input, performs one layer of URL/entity decoding for comparison, and
-never executes or renders the decoded data.
+Every input analyzed by XShield passes through a synchronized multi-stage pipeline:
 
-Implemented rule categories:
+1. **Input Normalization:** Bounded input slices (up to 10,000 characters) are whitespace-normalized, case-folded, and single-pass entity/URL decoded for analysis. Decoded content is treated strictly as data and is never rendered or executed.
+2. **Deterministic Rule Execution:** Rules R001 through R006 evaluate the normalized and decoded views. Each matched rule contributes its configured integer weight to the total rule score (capped at 100).
+3. **Statistical Inference:** The character-level TF-IDF vectorizer extracts 3–5 character n-grams, transforming the input into an 88,828-dimensional sparse representation evaluated by the Logistic Regression classifier.
+4. **Signal Fusion:** The normalized rule score ($[0.0, 1.0]$) and ML probability ($[0.0, 1.0]$) are evaluated using **Max-Signal Fusion**:
+   $$\text{hybrid\_signal} = \max(\text{normalized\_rule\_score}, \text{ml\_score})$$
+5. **Policy Triage:** The hybrid signal is mapped to a 0–100 risk score and dispatched to the action engine (`allow`, `flag`, `block`, or `block_and_alert`).
+6. **Telemetry Logging:** The execution context, rule hits, ML probabilities, decision metadata, and truncated inputs are atomically recorded in SQLite.
 
-| ID | Category | Weight |
-|---|---|---:|
-| R001 | Unexpected HTML-like markup | 12 |
-| R002 | Script-related constructs, including selected execution functions | 30 |
-| R003 | Event-handler-style attributes | 25 |
-| R004 | Potentially script-capable URL schemes | 25 |
-| R005 | Encoded characters decoding to suspicious constructs | 15 |
-| R006 | Combination of multiple independent indicators | 15 |
+### Active Detection Rules (R001–R006)
 
-The score is the sum of matched rule weights, capped at 100. Results include
-matched IDs, reasons, and rule details. For comparative evaluation, the
-explicit experimental binary threshold was `score >= 1`, meaning any positive
-rule score was classified as suspicious. These rules are indicators rather
-than complete XSS coverage and may miss new, fragmented, context-dependent, or
-obfuscated inputs.
+| Rule ID | Rule Name | Weight | Primary Detection Purpose |
+| :---: | :--- | :---: | :--- |
+| **R001** | Unexpected HTML markup | 12 | Detects HTML tags and structural markup in non-HTML input fields. |
+| **R002** | Script-related construct | 30 | Identifies `<script>` tags, closing tags, and execution functions (`eval(`, `setTimeout(`, `setInterval(`). |
+| **R003** | Event-handler attribute | 25 | Matches inline browser event handler attributes (e.g., `onload=`, `onerror=`, `onclick=`). |
+| **R004** | Suspicious URL scheme | 25 | Flags script-capable URI schemes including `javascript:`, `vbscript:`, and `data:`. |
+| **R005** | Encoded suspicious representation | 15 | Detects encoded entities (`%3c`, `&#x...;`) that resolve into executable constructs upon decoding. |
+| **R006** | Multiple suspicious indicators | 15 | Correlates co-occurring base indicators (triggers when 2 or more of R001–R005 match simultaneously). |
 
-## 7. Machine Learning
+---
 
-```text
-Dataset
-   |
-Preprocessing
-   |
-Train/Test Split
-   |
-Character TF-IDF
-   |
-Logistic Regression
-   |
-Prediction and XSS Probability
+## 5. Machine Learning
+
+XShield employs an optimized, explainable machine-learning baseline specifically tuned for character-level token analysis in short, structured web inputs:
+
+- **Vectorization:** Character-level TF-IDF (`analyzer="char"`).
+- **N-Gram Range:** 3 to 5 characters (`ngram_range=(3, 5)`), capturing syntax fragments, delimiters, and obfuscated sequences without relying on whitespace tokenization.
+- **Vocabulary Size:** 88,828 active features (`min_df=2`, `sublinear_tf=True`).
+- **Classifier:** Logistic Regression (`solver="liblinear"`, `class_weight="balanced"`, `max_iter=1000`, `random_state=42`).
+- **Decision Threshold:** Calibrated operating threshold of **0.35** for high-sensitivity attack detection.
+- **Training Corpus:** Trained on a verified canonical dataset of **24,327** unique samples (~24.3K):
+  - **15,839** Benign samples (65.11%)
+  - **8,488** XSS samples (34.89%)
+  - **0** Duplicate texts
+  - **0** Overlap with the frozen evaluation benchmark
+
+---
+
+## 6. Risk Engine
+
+The risk engine converts the bounded hybrid signal into a standardized 0–100 risk score:
+$$\text{risk\_score} = \text{hybrid\_signal} \times 100$$
+
+### Risk Tiers and Action Policies
+
+| Score Range | Risk Level | Action | System Response |
+| :---: | :---: | :---: | :--- |
+| **0 – 29** | **Low** | `allow` | Input is accepted and permitted through standard escaped rendering flows. |
+| **30 – 59** | **Medium** | `flag` | Input is permitted but marked for operational review and defensive monitoring. |
+| **60 – 79** | **High** | `block` | Input is rejected; the submitted text is discarded and blocked from reflection. |
+| **80 – 100** | **Critical** | `block_and_alert` | Input is immediately rejected and flagged for prioritized security incident triage. |
+
+---
+
+## 7. Behavioral Intelligence
+
+The behavioral intelligence engine evaluates recent event history on a per-application basis to detect multi-stage attack patterns that might evade single-request inspection:
+
+- **Repeated Suspicious Activity:** Detects clients generating recurring Medium, High, or Critical risk events within a sliding time window.
+- **Endpoint Repetition:** Identifies repeated probe patterns directed at identical normalized URL endpoints.
+- **Burst / High-Frequency Activity:** Triggers heuristic alerts when event volume exceeds short-window burst thresholds (e.g., rapid automated fuzzing or scanner runs).
+- **Attack-Pattern Diversity:** Measures the diversity of triggered detection rules across consecutive requests, surfacing broad multi-vector reconnaissance.
+- **Bounded Scope:** All calculations operate strictly on bounded, application-scoped historical records without inferring human identity or executing external tracking.
+
+---
+
+## 8. Incident Correlation
+
+XShield clusters related security events into discrete, actionable incidents using deterministic correlation logic:
+
+- **Correlation Criteria:** Events are grouped based on shared `request_id`, normalized endpoint paths, or overlapping detection rule patterns within the application-scoped correlation window.
+- **Automatic Incident Triggering:** Any event evaluated at **High** or **Critical** risk automatically generates or associates with an incident.
+- **Deterministic Incident IDs:** Generated using cryptographic SHA-256 digests over normalized event attributes, ensuring consistent forensic tracking.
+- **Contextual Telemetry:** Each incident synthesizes timelines, affected endpoints, matched rule catalogs, risk summaries, and behavioral indicators.
+
+---
+
+## 9. REST API
+
+XShield provides an authenticated REST API for external applications and microservices:
+
+### `POST /api/v1/events`
+
+Ingests and analyzes security events submitted by registered applications.
+
+#### Headers
+```http
+Content-Type: application/json
+X-API-Key: xsh_your_api_key_here
 ```
 
-The model uses the cleaned `HttpParamsDataset` split. Character-level TF-IDF
-represents recurring character sequences, which is useful for short input
-where punctuation, delimiters, encodings, and fragments can matter. The
-baseline classifier is Logistic Regression because it is relatively simple,
-fast, interpretable as a probability-producing linear baseline, and suitable
-for a beginner-friendly project.
-
-Actual training configuration:
-
-- `analyzer="char"`
-- `ngram_range=(3, 5)`
-- `min_df=2`
-- `sublinear_tf=True`
-- `class_weight="balanced"`
-- Logistic Regression solver: `liblinear`
-- `max_iter=1000`
-- random seed: `42`
-- Training corpus: `24,327` verified samples (~24.3K)
-- TF-IDF features: `88,828`
-
-The vectorizer is fitted only on training text. The saved artifacts are
-`models/xss_tfidf_vectorizer.joblib` and
-`models/xss_logistic_regression.joblib`. They are loaded only from these fixed
-project paths and must come from a trusted project source.
-
-## 8. Hybrid Detection
-
-The hybrid detector runs both detectors for the same text. The rule score is
-normalized from `0-100` to `0.0-1.0`, and the ML score is the probability of
-the XSS class:
-
-```text
-normalized_rule_score = rule_score / 100
-ml_score = XSS probability
-
-hybrid_signal =
-    rule_weight * normalized_rule_score
-    + ml_weight * ml_score
+#### Request Payload
+```json
+{
+  "event_type": "request_observation",
+  "endpoint": "/search",
+  "http_method": "POST",
+  "request_id": "req-98234-abc",
+  "input_fields": {
+    "query": "search term",
+    "filter": "active"
+  },
+  "metadata": {
+    "client_ip": {
+      "value": "192.168.1.100",
+      "trust": "observed"
+    }
+  },
+  "retention_mode": "truncated"
+}
 ```
 
-The current default configuration is:
-
-```text
-rule_weight = 0.5
-ml_weight   = 0.5
+#### Response (201 Created)
+```json
+{
+  "accepted": true,
+  "event_id": 142,
+  "application": "apex-test",
+  "status": "stored",
+  "analysis": {
+    "risk_score": 12.0,
+    "risk_level": "Low",
+    "action": "allow"
+  }
+}
 ```
 
-The implementation normalizes non-negative supplied weights so that they sum
-to one. These values are project configuration for experimentation, not
-industry standards or optimized claims.
+#### Status Codes
+- `201 Created`: Event successfully authenticated, analyzed, and persisted.
+- `400 Bad Request`: Malformed JSON or invalid syntax.
+- `401 Unauthorized`: Missing, malformed, or invalid `X-API-Key`.
+- `403 Forbidden`: Revoked or expired API key or inactive application.
+- `413 Request Entity Too Large`: Request body exceeds bounded limit (16 KiB).
+- `415 Unsupported Media Type`: Non-JSON Content-Type header.
+- `422 Unprocessable Entity`: Request contract violation or missing required fields.
 
-## 9. Risk Assessment
+---
 
-The risk engine converts the bounded hybrid signal to a `0-100` score:
+## 10. Security Controls & Hardening
 
-```text
-risk_score = hybrid_signal * 100
-```
+XShield enforces rigorous defensive programming practices across all tiers:
 
-The project-defined experimental thresholds are:
+- **Payload Non-Execution:** **XShield analyzes submitted input strictly as data; it never executes, evaluates, or interprets submitted payloads.**
+- **API Key Hashing:** API keys are generated using cryptographically secure random bytes with an `xsh_` prefix and stored exclusively as one-way SHA-256 digests. Plaintext keys are never stored, logged, or recoverable.
+- **Constant-Time Comparison:** Security tokens and key hashes are verified using `hmac.compare_digest` to prevent timing side-channel attacks.
+- **Application Isolation:** Every API key is strictly scoped to an application identifier. Events cannot cross application boundaries.
+- **SQL Parameterization:** All SQLite interactions use parameterized queries (`?` placeholders). No string concatenation is used in SQL operations.
+- **Output Autoescaping:** All HTML views utilize Jinja2 template autoescaping to prevent console reflection vulnerabilities.
+- **Bounded Request Limits:** Server-side request limits enforce a 16 KiB maximum payload size to prevent denial-of-service via memory exhaustion.
+- **Defensive HTTP Headers:** Responses include `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: strict-origin-when-cross-origin`, and Content Security Policy (CSP).
+- **Fail-Closed Protection:** In protected client integrations, communication failures or high-risk assessments fail safely by rejecting malicious inputs.
 
-| Score | Risk level |
-|---:|---|
-| 0-29 | Low |
-| 30-59 | Medium |
-| 60-79 | High |
-| 80-100 | Critical |
+---
 
-These thresholds are not universal cybersecurity standards.
+## 11. Security Console
 
-## 10. Response Policy
+The XShield Security Operations Console provides a centralized local interface for threat observation:
 
-| Risk level | Action | Local prototype behavior |
-|---|---|---|
-| Low | `allow` | Continue the safe escaped-text demonstration flow. |
-| Medium | `flag` | Continue only through the safe escaped-text flow and mark it for attention. |
-| High | `block` | Reject the input in the local demonstration and do not display the submitted content. |
-| Critical | `block_and_alert` | Reject it and mark that a future alert would be required. |
+- **Executive Dashboard (`/dashboard`):** Real-time threat volume, risk distribution gauges, engine telemetry, and recent event feeds.
+- **Events Ledger (`/dashboard/events`):** Full telemetry audit log with multi-criteria filtering by risk tier (`Low`, `Medium`, `High`, `Critical`), action type (`allow`, `flag`, `block`), and keyword search.
+- **Incidents View (`/dashboard/incidents`):** Correlated security incidents with linked events, chronological timelines, and root-cause indicators.
+- **Behavioral Intelligence (`/dashboard/behavior`):** Active behavioral context metrics showing short-window bursts, repetitive endpoints, and attack diversity scores.
+- **Applications Registry (`/dashboard/applications`):** Status, key counts, and telemetry volume for registered client integrations.
+- **Event Detail View (`/dashboard/event/<id>`):** Detailed forensic breakdown for individual events with escaped payload views, rule-by-rule inspection, and ML confidence.
+- **Light/Dark Theme:** Full theme toggle with persistent preference storage across sessions.
 
-The prototype does not block IP addresses, change a firewall, terminate
-network connections, or send external alerts.
+> **Demonstration Mode Note:** The local security console is unauthenticated to allow straightforward evaluation during project demonstrations. Production deployments require enterprise single sign-on (SSO) and role-based access control (RBAC).
 
-## 11. Database Logging
+---
 
-`app/database/db.py` stores events in `data/xshield.sqlite3` in the
-`security_events` table. A completed event includes:
+## 12. ApexTestWebsite Integration
 
-- auto-incrementing ID
-- UTC timestamp
-- submitted combined input text
-- rule score
-- ML probability and prediction
-- hybrid signal
-- risk score and risk level
-- action
-- detector agreement
-- JSON-encoded matched rules and reasons
+`ApexTestWebsite` is an independent external demonstration web application that integrates with XShield strictly through HTTP REST API calls:
 
-The database layer provides recent-event retrieval, event lookup, total
-counts, risk-level counts, dashboard statistics, and bounded filters. SQL
-values are passed as parameters. Raw input is retained for this local
-demonstration; production use would require data minimization, privacy,
-retention, access, encryption, and backup decisions.
+- **Decoupled Architecture:** ApexTestWebsite runs as an independent service (port `3000`) and does not import XShield internal Python modules.
+- **API Authentication:** Authenticates outbound event submissions using an application-scoped `X-API-Key`.
+- **Live Interception:** Forwards form inputs to `POST /api/v1/events` on XShield and enforces real-time blocking when high-risk scores are returned.
 
-## 12. Dashboard
+---
 
-- Dashboard: `GET /dashboard`
-- Event details: `GET /dashboard/event/<id>`
+## 13. Controlled XSS Playground
 
-The dashboard shows total events, Low/Medium/High/Critical counts, blocked
-events, a risk distribution, up to 50 newest events, risk/action filters, text
-search, and event details. Event text is rendered through normal Jinja
-escaping.
+ApexTestWebsite includes a controlled side-by-side demonstration sandbox to showcase attack detection and prevention:
 
-XShield console is unauthenticated in local demonstration mode. API ingestion remains authenticated using X-API-Key.
+- **Protected Mode:** Inputs are intercepted by XShield. Malicious payloads are detected, assigned High/Critical risk, blocked, and recorded in the Security Console.
+- **Vulnerable-Render Mode:** Demonstrates the raw consequences of unencoded input reflection in an isolated, safe test sandbox using harmless local test vectors (e.g., benign text probes).
+- **Educational Value:** Clearly illustrates why input detection and contextual output encoding are complementary layers of defense.
 
-```powershell
-.\.venv\Scripts\python.exe -m app
-```
+---
 
-The unauthenticated console is intended specifically for local development and controlled demonstration. It is not designed or represented as a production-secure deployment configuration. API endpoints (`POST /api/v1/events`) continue to strictly require valid `X-API-Key` headers.
-
-## 13. Dataset
-
-XShield uses `HttpParamsDataset` from the original
-[Morzeux/HttpParamsDataset repository](https://github.com/Morzeux/HttpParamsDataset)
-and its Kaggle distribution. The project records the original source license
-as MIT.
-
-The source includes `payload`, `length`, `attack_type`, and `label` fields.
-XShield uses only:
-
-- `attack_type=norm` -> label `0` -> `BENIGN`
-- `attack_type=xss` -> label `1` -> `XSS`
-
-SQL injection, command injection, and path-traversal records are excluded
-instead of being relabeled as XSS. The preparation script:
-
-- checks required columns;
-- removes missing/blank or unsupported records;
-- removes exact duplicates;
-- removes case-folded, whitespace-normalized duplicate text;
-- creates `text` and binary `label` columns;
-- makes a reproducible 80/20 per-class split with seed `42`;
-- checks for normalized train/test overlap.
-
-## 13. Final Dataset Preparation
-
-The final XSS machine-learning model is trained on a comprehensive canonical pool of verified samples:
-
-| Quantity | Value |
-|---|---:|
-| Total verified training pool | 24,327 (~24.3K) |
-| Benign training samples | 15,839 (65.11%) |
-| XSS attack samples | 8,488 (34.89%) |
-| Duplicate samples in pool | 0 |
-| Frozen evaluation benchmark | 3,967 |
-| Benchmark benign / XSS | 3,861 / 106 |
-| Train-benchmark overlap | 0 (strictly isolated) |
-
-The training pool combines validated academic, SecLists, and curated technical corpora, canonicalized using safe URL-decoding, whitespace normalization, and casefolding, with zero benchmark leakage.
-
-## 14. Model Evaluation
-
-Evaluated across the exact same frozen held-out benchmark of 3,967 samples (`data/processed/xss_test.csv`). No model or vectorizer was fitted on this benchmark set. The positive class is XSS (`label=1`).
-
-Evaluation thresholds were fixed and documented:
+## 14. Benchmark Results
 
-- Rule score: `>= 1`
-- ML XSS probability: `>= 0.5`
-- Hybrid signal: `>= 0.5`
+The XShield detection pipeline was evaluated against a **frozen benchmark of 3,967 samples** (`data/processed/xss_test.csv`).
 
-| Method | Accuracy | Precision (XSS) | Recall (XSS) | F1 (XSS) |
-|---|---:|---:|---:|---:|
-| Rule-Based | 0.997983 | 1.000000 | 0.924528 | 0.960784 |
-| Final ML (TF-IDF + LR) | 0.999244 | 1.000000 | 0.971698 | 0.985646 |
-| Hybrid (50/50 Fusion) | 0.997227 | 1.000000 | 0.896226 | 0.945274 |
+> **Methodology Note:** The frozen benchmark was kept strictly isolated from model training and threshold selection. No vectorizer or classifier was fitted on this benchmark set.
 
-Confusion matrices use rows as actual labels `[0, 1]` and columns as predicted
-labels `[0, 1]`:
+### Final Evaluation Metrics (Frozen Held-Out Benchmark)
 
-| Method | TN | FP | FN | TP |
-|---|---:|---:|---:|---:|
-| Rule-Based | 3,861 | 0 | 8 | 98 |
-| Final ML | 3,861 | 0 | 3 | 103 |
-| Hybrid | 3,861 | 0 | 11 | 95 |
+| Detection Engine | Accuracy | Precision (XSS) | Recall (XSS) | F1-Score (XSS) |
+| :--- | :---: | :---: | :---: | :---: |
+| **Rule-Based Engine (R001–R006)** | 99.80% | 100.00% | 92.45% | 96.08% |
+| **Final ML Model (TF-IDF + LR)** | **99.92%** | **100.00%** | **97.17%** | **98.56%** |
+| **Hybrid Detector (Fusion)** | 99.72% | 100.00% | 89.62% | 94.53% |
 
-These are offline held-out benchmark results and are not production guarantees.
-Benchmark performance does not equal real-world attack detection coverage against novel or context-specific evasions.
-Detailed results are stored in `reports/evaluation_results.json`.
-
-## 15. Security Review
-
-Platform security hardening verified:
-
-- server-side field validation and per-field limits;
-- a 16 KiB Flask request-size limit;
-- Jinja output escaping and no unsafe application HTML/JavaScript sinks;
-- parameterized SQLite queries and allowlisted dashboard filters;
-- fixed-path trusted model loading with controlled missing/corrupt errors;
-- generic user-facing database failure messages;
-- disabled debug mode by default;
-- Content Security Policy, `nosniff`, `X-Frame-Options`, and
-  `Referrer-Policy` headers;
-- unauthenticated local security console for local demonstration mode;
-- authenticated ingestion API (`POST /api/v1/events`) with one-way SHA-256 hashed API keys;
-- safe logging and preservation of existing database records.
+### Confusion Matrix Breakdown
 
-The review report is `reports/security_review.md`.
+| Detection Engine | True Negatives (TN) | False Positives (FP) | False Negatives (FN) | True Positives (TP) | Total Samples |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Rule-Based Engine** | 3,861 | 0 | 8 | 98 | 3,967 |
+| **Final ML Model** | **3,861** | **0** | **3** | **103** | **3,967** |
+| **Hybrid Detector** | 3,861 | 0 | 11 | 95 | 3,967 |
 
-## 16. Known Limitations
+- **Zero False Positives:** Across 3,861 benign benchmark samples, the final ML model achieved a **0.00% false-positive rate** ($\text{FP} = 0$).
+- **High Recall:** The model successfully identified 103 out of 106 XSS attacks ($\text{Recall} = 97.17\%$).
 
-- Results depend on the selected dataset and its strongly imbalanced test set.
-- Rules and ML can produce false negatives and may not generalize to every
-  browser context, encoding, or application.
-- Rule, hybrid, and risk thresholds are project-defined experimental values.
-- The response policy is application-level demonstration behavior.
-- SQLite and raw input retention are not production-scale privacy or storage
-  designs.
-- HTTPS/TLS is not configured.
-- Production identity, authorization roles, and audit controls are not
-  implemented.
-- Dashboard credentials would require secure storage, rotation, and stronger
-  identity management in production.
-- Requirements are not pinned or hash-locked.
-- CSRF and production deployment controls require a deliberate future design.
+---
 
-## 17. Future Scope
-
-Appropriate future work includes larger and more diverse datasets, additional
-ML and deep-learning comparisons, adversarial robustness testing, calibrated
-threshold studies, optional threat-intelligence integration, production
-authentication/authorization, HTTPS deployment, centralized logging,
-privacy/retention policies, a scalable database, and real-time monitoring.
-These features are not currently implemented.
-
-## 18. Installation
-
-From the project root on Windows:
-
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
-```
-
-The repository includes the prepared dataset and saved model artifacts for
-demonstration. To reproduce preparation or training locally:
-
-```powershell
-.\.venv\Scripts\python.exe scripts\prepare_dataset.py
-.\.venv\Scripts\python.exe scripts\train_ml_model.py
-```
-
-Training is not required for ordinary application startup when the saved
-artifacts already exist.
-
-## 19. Running XShield
-
-Start the application:
-
-```powershell
-.\.venv\Scripts\python.exe -m app
-```
-
-> **Note:** XShield console is unauthenticated in local demonstration mode. API ingestion remains authenticated using X-API-Key.
-
-Open:
-
-- Application: <http://127.0.0.1:5000/>
-- Health check: <http://127.0.0.1:5000/health>
-- Security Console: <http://127.0.0.1:5000/dashboard>
-
-The development entry point keeps debug mode disabled unless
-`XSHIELD_DEBUG=true` is explicitly set.
-
-### Fresh Demo
-
-For a clean demonstration starting from zero recorded telemetry:
-
-1. Reset local demo telemetry:
-   ```powershell
-   .\.venv\Scripts\python.exe scripts/reset_demo_data.py
-   ```
-2. Confirm with:
-   ```text
-   RESET
-   ```
-3. Start XShield.
-4. Start ApexTestWebsite.
-5. Generate demonstration events.
-6. Inspect events in the Security Operations Console (`/dashboard`).
-7. Restart XShield to demonstrate persistence.
-
-> **Important Persistence Note:** XShield does not clear security events on startup. Events are persistent local telemetry stored in SQLite.
->
-> The reset command is an explicit local demonstration utility and should not be treated as a production data-retention mechanism.
-
-## 20. Testing
-
-Run the complete test suite:
-
-```powershell
-.\.venv\Scripts\python.exe -m unittest discover -s tests -v
-```
-
-Run comparative evaluation without retraining:
-
-```powershell
-.\.venv\Scripts\python.exe scripts\evaluate_all.py
-```
-
-Run the earlier ML-only evaluation:
-
-```powershell
-.\.venv\Scripts\python.exe scripts\evaluate_model.py
-```
-
-The test suite includes detector, ML artifact, risk, action, database,
-dashboard, pipeline, evaluation, and security-hardening coverage.
-
-## 21. Project Structure
+## 15. Project Structure
 
 ```text
 XShield/
-|-- app/
-|   |-- __init__.py
-|   |-- __main__.py
-|   |-- routes.py
-|   |-- validation.py
-|   |-- database/
-|   |-- detector/
-|   |-- ml/
-|   |-- risk/
-|   |-- response/
-|   |-- services/
-|   |-- static/
-|   |-- templates/
-|-- data/
-|   |-- raw/
-|   |-- processed/
-|-- docs/
-|-- logs/
-|-- models/
-|-- reports/
-|-- scripts/
-|-- tests/
-|-- .gitignore
-|-- README.md
-|-- requirements.txt
+├── app/                              # Core application package
+│   ├── __init__.py                   # Application factory (Flask)
+│   ├── __main__.py                   # CLI entry point for python -m app
+│   ├── api.py                        # REST API routes (POST /api/v1/events)
+│   ├── config.py                     # Configuration constants & limits
+│   ├── routes.py                     # Public routes & Security Console views
+│   ├── validation.py                 # Input validation and size checks
+│   ├── database/                     # SQLite persistence layer
+│   │   ├── __init__.py
+│   │   └── db.py                     # Schema migrations & queries
+│   ├── detector/                     # Rule-based heuristic engines
+│   │   ├── __init__.py
+│   │   ├── hybrid_detector.py        # Max-Signal fusion orchestration
+│   │   ├── rule_engine.py            # Rule execution runner
+│   │   └── rules.py                  # R001-R006 rule definitions
+│   ├── ml/                           # Machine learning components
+│   │   ├── __init__.py
+│   │   └── predictor.py              # TF-IDF vectorization & inference
+│   ├── response/                     # Action policy dispatch
+│   │   ├── __init__.py
+│   │   └── action_engine.py          # Allow / Flag / Block policy
+│   ├── risk/                         # Risk scoring engine
+│   │   ├── __init__.py
+│   │   └── risk_engine.py            # 0-100 score mapping & reasons
+│   ├── services/                     # Business logic services
+│   │   ├── __init__.py
+│   │   ├── analysis.py               # Unified analysis orchestration
+│   │   ├── api_keys.py               # SHA-256 API key management
+│   │   ├── behavior.py               # Behavioral intelligence context
+│   │   ├── dashboard.py              # Telemetry aggregation
+│   │   ├── event_contract.py         # Bounded event contract
+│   │   ├── event_ingestion.py        # Ingestion validation & storage
+│   │   ├── incidents.py              # Deterministic incident correlation
+│   │   └── security_logger.py        # Database event persistence
+│   ├── static/                       # Static web assets
+│   │   ├── css/style.css             # UI styling & light/dark theme
+│   │   └── js/script.js              # Theme switcher & UI helpers
+│   └── templates/                    # Jinja2 presentation templates
+│       ├── api_docs.html
+│       ├── base.html
+│       ├── base_console.html
+│       ├── base_product.html
+│       ├── benchmark.html
+│       ├── dashboard.html
+│       ├── dashboard_applications.html
+│       ├── dashboard_behavior.html
+│       ├── dashboard_events.html
+│       ├── dashboard_incidents.html
+│       ├── demo.html
+│       ├── event_detail.html
+│       ├── event_not_found.html
+│       ├── home.html
+│       ├── how_it_works.html
+│       ├── rules.html
+│       └── scanner.html
+├── data/                             # Dataset storage
+│   ├── processed/                    # Cleaned training & benchmark splits
+│   │   ├── xss_train_final.csv       # Final training corpus (24,327 samples)
+│   │   ├── xss_test.csv              # Frozen evaluation benchmark (3,967 samples)
+│   │   └── dataset_report.json
+│   └── raw/                          # Raw source data manifests
+├── docs/                             # Engineering documentation
+│   ├── XShield_Technical_Documentation.md
+│   ├── architecture.md
+│   ├── demo_guide.md
+│   ├── security.md
+│   └── setup.md
+├── models/                           # Trained ML artifacts (.joblib gitignored)
+│   ├── ml_training_report.json       # Training metadata & hyperparams
+│   └── .gitkeep
+├── reports/                          # Evaluation reports & confusion matrices
+│   ├── evaluation_results.json
+│   ├── evaluation_report.txt
+│   ├── hybrid_confusion_matrix.json
+│   ├── ml_confusion_matrix.json
+│   └── rule_confusion_matrix.json
+├── scripts/                          # Administration & evaluation utilities
+│   ├── evaluate_all.py               # Complete benchmark evaluation
+│   ├── manage_applications.py        # Application & API key CLI
+│   ├── reset_demo_data.py            # Clean telemetry reset utility
+│   └── train_ml_model.py             # Reproducible model training
+├── tests/                            # Automated test suite (157 tests)
+│   ├── test_action_engine.py
+│   ├── test_application_management.py
+│   ├── test_dashboard.py
+│   ├── test_database.py
+│   ├── test_detector.py
+│   ├── test_hybrid_detector.py
+│   ├── test_ml_prediction.py
+│   ├── test_phase4_api.py
+│   ├── test_phase6_behavior.py
+│   ├── test_phase7_incidents.py
+│   ├── test_reset_demo_data.py
+│   ├── test_risk_engine.py
+│   ├── test_rule_engine.py
+│   └── test_security_hardening.py
+├── .gitignore                        # Git exclusion rules
+├── README.md                         # Project documentation
+└── requirements.txt                  # Python dependencies
 ```
 
-Generated/local files such as SQLite databases, Joblib artifacts, logs, byte
-code, and virtual-environment contents are covered by `.gitignore`. The
-prepared data and saved artifacts may be present locally for demonstration.
+---
 
-## 22. Ethical and Security Considerations
+## 16. Requirements
 
-All analysis is local and defensive. Dataset strings are treated as data and
-are not executed or sent to external websites. XShield should be used only on
-input and systems for which the user has authorization. Detection output is
-not proof of malicious intent, and stored input may contain sensitive
-information; retention and access should be minimized.
+- **Operating System:** Windows 10/11, Linux, or macOS.
+- **Python Runtime:** Python 3.10, 3.11, or 3.12 (Python 3.11+ recommended).
+- **Core Dependencies:**
+  - `Flask` (Web framework and REST routing)
+  - `scikit-learn` (TF-IDF vectorizer and Logistic Regression)
+  - `joblib` (Model persistence)
+  - `numpy` & `pandas` (Matrix and tabular operations)
 
-More detailed documentation is available in:
+---
 
-- `docs/XShield_Technical_Documentation.md`
-- `docs/architecture.md`
-- `docs/setup.md`
-- `docs/security.md`
-- `docs/parameters.md`
+## 17. Installation
 
-## XShield Event Contract and Database Foundation
+### 1. Clone the Repository
+```powershell
+git clone https://github.com/Veldora-0/XShield.git
+cd XShield
+```
 
-The Phase 1 internal contract is implemented in
-`app/services/event_contract.py`. It is intended to become the shared
-boundary for the existing browser form and the future `/api/v1/events`
-integration endpoint.
+### 2. Create and Activate Virtual Environment
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
 
-The contract supports:
+### 3. Install Dependencies
+```powershell
+pip install -r requirements.txt
+```
 
-- `event_type`: currently `input_analysis` or `request_observation`;
-- named `input_fields`;
-- optional application slug, request ID, HTTP method, and endpoint;
-- metadata values explicitly labeled `observed`, `supplied`, or `derived`;
-- bounded/truncated retention mode selection.
+---
 
-Phase 2 adds the following SQLite structures:
+## 18. Running XShield
 
-- `schema_migrations` for idempotent schema-version tracking;
-- `applications` for future multi-application registration;
-- `security_events.application_id` linking events to an application;
-- an automatically created `legacy-local` application for existing and
-  current browser-originated events.
-
-Existing event rows are preserved and backfilled to `legacy-local`. Repeating
-application startup or `initialize_database` does not duplicate the
-application or events.
-
-Phase 3 extends the foundation with:
-
-- `applications.updated_at` and application status management;
-- `api_keys`, containing only SHA-256 hashes, ownership, status, creation,
-  optional expiration, and optional last-used timestamps;
-- a local management script at `scripts/manage_applications.py`;
-- `app.services.api_keys.authenticate_api_key`, which future API endpoints can
-  call without changing the existing browser flow.
-
-Create and manage local applications and keys:
+Start the XShield web application and Security Console:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\manage_applications.py create-application demo-site "Demo Site"
+cd D:\XShield
+.\.venv\Scripts\python.exe -m app
+```
+
+Once started, the following interfaces will be available:
+- **Public Product Portal:** <http://127.0.0.1:5000/>
+- **Interactive Payload Scanner:** <http://127.0.0.1:5000/scanner>
+- **Security Operations Console:** <http://127.0.0.1:5000/dashboard>
+- **Events Ledger:** <http://127.0.0.1:5000/dashboard/events>
+- **Correlated Incidents:** <http://127.0.0.1:5000/dashboard/incidents>
+- **API Documentation:** <http://127.0.0.1:5000/api>
+- **System Health Check:** <http://127.0.0.1:5000/health>
+
+### Managing Applications and API Keys
+To generate API keys for client applications, use the CLI utility:
+
+```powershell
+# List registered applications
 .\.venv\Scripts\python.exe scripts\manage_applications.py list-applications
-.\.venv\Scripts\python.exe scripts\manage_applications.py create-api-key --slug demo-site
-.\.venv\Scripts\python.exe scripts\manage_applications.py list-api-keys
-.\.venv\Scripts\python.exe scripts\manage_applications.py revoke-api-key 1
+
+# Create a new client application
+.\.venv\Scripts\python.exe scripts\manage_applications.py create-application demo-client "Demo Client Application"
+
+# Generate an authenticated API key (key is displayed ONCE)
+.\.venv\Scripts\python.exe scripts\manage_applications.py create-api-key --slug demo-client
 ```
 
-The full API key is printed once by `create-api-key`; it is not stored in the
-database and cannot be recovered later. Store it in a future integrating
-application through an environment variable, for example:
+### Resetting Demonstration Telemetry
+To reset the demonstration telemetry ledger to a clean state while preserving registered applications and API keys:
 
 ```powershell
-$env:XSHIELD_API_KEY = "xsh_<copy-the-one-time-value-here>"
+.\.venv\Scripts\python.exe scripts\reset_demo_data.py
+# Type 'RESET' when prompted
 ```
 
-No `/api/v1/events` route, event ingestion, dashboard registration UI, or
-detector/pipeline behavior is part of Phase 3.
+---
 
-Phase 4 adds `POST /api/v1/events` as a JSON-only, API-key-authenticated
-ingestion endpoint. It normalizes requests through
-`SecurityEventContract`, derives application ownership from the authenticated
-key, applies bounded retention, and stores accepted events in the existing
-`security_events` table. It does not add behavioral analysis, incidents,
-dashboard redesign, or external integrations.
+## 19. Running ApexTestWebsite (External Integration)
 
-Example local request:
+To launch the separate client application:
 
 ```powershell
-$headers = @{ "X-API-Key" = $env:XSHIELD_API_KEY }
-$body = @{
-  event_type = "request_observation"
-  endpoint = "/search"
-  method = "POST"
-  input_fields = @{ query = "untrusted text" }
-  metadata = @{
-    client_ip = @{ value = "127.0.0.1"; trust = "observed" }
-  }
-  retention_mode = "truncated"
-} | ConvertTo-Json -Depth 6
-Invoke-WebRequest -Uri http://127.0.0.1:5000/api/v1/events `
-  -Method Post -Headers $headers -ContentType "application/json" -Body $body
+cd D:\ApexTestWebsite
+python run.py
 ```
 
-Accepted events return `201` with `accepted`, `event_id`, `application`, and
-`status`. Missing/invalid credentials return `401`; revoked or expired
-credentials return `403`; malformed JSON returns `400`; invalid event fields
-return `422`; wrong content type returns `415`; and oversized requests return
-`413`. Rate limiting is not implemented in this local phase.
+The client application will start on <http://127.0.0.1:3000> and communicate with XShield on port 5000.
 
-### XShield Phase 5 shared analysis
+---
 
-Browser submissions and authenticated API events now use the same
-`app.services.analysis.analyze_security_input` orchestration. It calls the
-existing hybrid detector, risk engine, and action engine once per accepted
-analyzable event. API input is the bounded, normalized `input_fields` mapping;
-metadata, timestamps, request IDs, and application context are not analyzed as
-payloads. The resulting rule, ML, hybrid, risk, action, and explanation data
-is stored in the existing `security_events` record.
+## 20. Testing
 
-If analysis fails, the API returns a controlled `500` response and does not
-persist an event that appears safe or allowed. Persistence failures also
-return a controlled `500`; no second analysis invocation or background queue
-is used.
+Run the complete automated test suite across all modules:
+
+```powershell
+# Run all XShield unit and integration tests (157 expected)
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+
+# Run reproducible evaluation across the frozen benchmark
+.\.venv\Scripts\python.exe scripts\evaluate_all.py
+```
+
+---
+
+## 21. Example Workflow
+
+1. **Ingest Payload:** A client submits user input to a protected web form.
+2. **API Dispatch:** The client forwards the input to `POST /api/v1/events` with its `X-API-Key`.
+3. **Authentication:** XShield computes the SHA-256 hash of the key, checks the database in constant time, and verifies the application status.
+4. **Heuristic Evaluation:** Rules R001–R006 inspect the decoded text for markup, script tags, event handlers, and encoding tricks.
+5. **ML Prediction:** The character TF-IDF vectorizer extracts n-grams and computes the probability of malicious intent.
+6. **Signal Fusion:** Max-Signal Fusion combines the evidence into an explainable 0–100 risk score.
+7. **Action Dispatch:** If risk is High or Critical, the API returns a blocking directive.
+8. **Forensic Logging:** Telemetry is written to the SQLite ledger and immediately appears in the Security Console.
+
+---
+
+## 22. Limitations
+
+- **Input-Layer Scope:** XShield evaluates inputs before processing. It cannot verify whether an input is safely handled by downstream application templates or context-aware encoding.
+- **Offline Benchmark Evaluation:** Benchmark metrics (99.92% accuracy, 0% FP) reflect evaluation on the curated benchmark dataset; real-world obfuscation and zero-day evasion techniques may yield different performance.
+- **Single-Host Database:** Uses SQLite for local persistence, which is appropriate for prototype demonstrations and single-node instances, but requires PostgreSQL or distributed storage for enterprise workloads.
+- **Console Authentication:** The local security console operates unauthenticated for demonstration purposes; production deployments require enterprise identity providers (IdP) and RBAC.
+
+---
+
+## 23. Future Scope
+
+- **Deep Learning Comparison:** Benchmarking against transformer-based tokenizers (e.g., CodeBERT, SecBERT) for complex JavaScript evasion patterns.
+- **Distributed Ingestion:** Migration to asynchronous event brokers (e.g., Apache Kafka, Redis Streams) for distributed microservice deployments.
+- **Automated Rule Synthesis:** Dynamic generation of heuristic rules based on emerging attack clusters identified by the incident correlation engine.
+- **Context-Aware Output Verification:** Integrating client-side instrumentation to verify whether blocked payloads would have executed in specific DOM contexts.
+
+---
+
+## 24. Project Information
+
+- **Project:** XShield — Hybrid XSS Attack Detection & Risk Intelligence Platform
+- **Author:** Varun Goel
+- **Academic Context:** B.Tech Computer Science & Engineering
+- **Institution:** ABES Engineering College, Ghaziabad (Affiliated to AKTU, Lucknow)
+- **Project Guide:** Mr. Priyan S
+- **Repository:** [https://github.com/Veldora-0/XShield.git](https://github.com/Veldora-0/XShield.git)

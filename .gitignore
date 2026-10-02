@@ -1,8 +1,17 @@
-.venv/
+# Python bytecode and caches
 __pycache__/
 *.py[cod]
+*.pyo
+*.pyd
 .pytest_cache/
-.coverage
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
 
 # Local environment and secret credentials
 .env
@@ -15,21 +24,53 @@ __pycache__/
 credentials.json
 secrets.json
 
-# Raw and generated artifacts excluded from the first commit
+# Local databases
+*.sqlite
+*.sqlite3
+*.db
+
+# Logs
+*.log
+logs/*
+!logs/.gitkeep
+
+# Coverage and testing outputs
+.coverage
+htmlcov/
+coverage.xml
+
+# IDE and editor artifacts
+.vscode/
+.idea/
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Temporary and scratch files
+*.tmp
+*.bak
+*.swp
+*.swo
+scratch/
+tmp/
+temp/
+
+# Generated runtime artifacts
+instance/
+uploads/
+
+# Python packaging
+build/
+dist/
+*.egg-info/
+
+# Generated model weights
+*.joblib
+*.pkl
+
+# Raw large source datasets and generated prediction logs excluded from git
 data/raw/httpparamsdataset.zip
 data/raw/httpparamsdataset/
 data/raw/Xss_dataset.csv
 reports/ml_test_predictions.csv
-
-# Local application data
-*.db
-*.sqlite
-*.sqlite3
-
-# Generated model files
-*.joblib
-*.pkl
-
-# Keep the directories, but not generated log contents
-logs/*
-!logs/.gitkeep
