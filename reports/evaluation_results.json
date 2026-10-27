@@ -114,7 +114,7 @@
           "true_positive": 103
         },
         "threshold": 0.35,
-        "threshold_meaning": "Probability at or above 0.5 is classified as XSS.",
+        "threshold_meaning": "Probability at or above 0.35 is classified as XSS.",
         "tfidf_features": 88828
       },
       "errors": {
@@ -168,7 +168,7 @@
           "true_positive": 103
         },
         "threshold": 0.35,
-        "threshold_meaning": "Hybrid signal at or above 0.5 is classified as XSS."
+        "threshold_meaning": "Hybrid signal at or above 0.35 is classified as XSS."
       },
       "errors": {
         "false_positives": [],
@@ -198,12 +198,12 @@
   "performance": {
     "local_measurement_only": true,
     "samples": 3967,
-    "rule_total_seconds": 0.05312609998509288,
-    "ml_total_seconds": 0.1065367000119295,
-    "hybrid_total_seconds": 4.65165379998507,
-    "rule_average_ms": 0.013392009071109877,
-    "ml_average_ms": 0.02685573481520784,
-    "hybrid_average_ms": 1.172587295181515
+    "rule_total_seconds": 0.04232159999810392,
+    "ml_total_seconds": 0.09284259999549249,
+    "hybrid_total_seconds": 4.684531599996262,
+    "rule_average_ms": 0.010668414418478428,
+    "ml_average_ms": 0.02340373077778989,
+    "hybrid_average_ms": 1.180875119736895
   },
   "model": {
     "model_file": "D:\\XShield\\models\\xss_logistic_regression.joblib",

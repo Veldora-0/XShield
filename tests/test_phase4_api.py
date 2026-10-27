@@ -238,6 +238,43 @@ class Phase4ApiTests(unittest.TestCase):
         self.assertIsNotNone(get_event_by_id(historical["id"], self.database_path))
         self.assertEqual(len(self._keys()), 2)
 
+    def test_get_event_decision_authenticated_and_isolated(self):
+        post_resp = self.post(key=self.key)
+        self.assertEqual(post_resp.status_code, 201)
+        event_id = post_resp.get_json()["event_id"]
+
+        # Valid fetch with owning application key
+        get_resp = self.client.get(
+            f"/api/v1/events/{event_id}",
+            headers={"X-API-Key": self.key},
+        )
+        self.assertEqual(get_resp.status_code, 200)
+        data = get_resp.get_json()
+        self.assertEqual(data["event_id"], event_id)
+        self.assertEqual(data["application"], self.application["slug"])
+        self.assertIn("action", data)
+        self.assertIn("blocked", data)
+        self.assertIn("risk_level", data)
+        self.assertIn("risk_score", data)
+
+        # Non-owning application cannot access (404 isolation)
+        isolated_resp = self.client.get(
+            f"/api/v1/events/{event_id}",
+            headers={"X-API-Key": self.other_key},
+        )
+        self.assertEqual(isolated_resp.status_code, 404)
+
+        # Unauthenticated request returns 401
+        unauth_resp = self.client.get(f"/api/v1/events/{event_id}")
+        self.assertEqual(unauth_resp.status_code, 401)
+
+        # Non-existent event returns 404
+        missing_resp = self.client.get(
+            "/api/v1/events/999999",
+            headers={"X-API-Key": self.key},
+        )
+        self.assertEqual(missing_resp.status_code, 404)
+
     def test_unsupported_method_and_health_homepage_remain_available(self):
         response = self.client.get("/api/v1/events")
         self.assertEqual(response.status_code, 405)

@@ -279,7 +279,7 @@ The XShield detection pipeline was evaluated against a **frozen benchmark of 3,9
 | :--- | :---: | :---: | :---: | :---: |
 | **Rule-Based Engine (R001–R006)** | 99.80% | 100.00% | 92.45% | 96.08% |
 | **Final ML Model (TF-IDF + LR)** | **99.92%** | **100.00%** | **97.17%** | **98.56%** |
-| **Hybrid Detector (Fusion)** | 99.72% | 100.00% | 89.62% | 94.53% |
+| **Hybrid Detector (Max-Signal Fusion)** | **99.92%** | **100.00%** | **97.17%** | **98.56%** |
 
 ### Confusion Matrix Breakdown
 
@@ -287,10 +287,10 @@ The XShield detection pipeline was evaluated against a **frozen benchmark of 3,9
 | :--- | :---: | :---: | :---: | :---: | :---: |
 | **Rule-Based Engine** | 3,861 | 0 | 8 | 98 | 3,967 |
 | **Final ML Model** | **3,861** | **0** | **3** | **103** | **3,967** |
-| **Hybrid Detector** | 3,861 | 0 | 11 | 95 | 3,967 |
+| **Hybrid Detector** | **3,861** | **0** | **3** | **103** | **3,967** |
 
-- **Zero False Positives:** Across 3,861 benign benchmark samples, the final ML model achieved a **0.00% false-positive rate** ($\text{FP} = 0$).
-- **High Recall:** The model successfully identified 103 out of 106 XSS attacks ($\text{Recall} = 97.17\%$).
+- **Zero False Positives:** Across 3,861 benign benchmark samples, the final ML and hybrid detectors achieved a **0.00% false-positive rate** ($\text{FP} = 0$).
+- **High Recall:** The hybrid detector successfully identified 103 out of 106 XSS attacks ($\text{Recall} = 97.17\%$).
 
 ---
 

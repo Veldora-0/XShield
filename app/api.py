@@ -9,6 +9,7 @@ from functools import wraps
 from flask import Blueprint, current_app, jsonify, request
 from werkzeug.exceptions import BadRequest
 
+from app.database import get_event_by_id
 from app.services.api_keys import authenticate_flask_request
 from app.services.event_ingestion import EventAnalysisError, persist_ingestion_event
 
@@ -75,3 +76,34 @@ def ingest_event(application):
             "status": "accepted",
         }
     ), 201
+
+
+@api_v1.get("/events/<int:event_id>")
+@api_key_required
+def get_event_decision(application, event_id: int):
+    """Retrieve security analysis and decision telemetry for an event owned by the authenticated application."""
+    event = get_event_by_id(event_id, current_app.config["DATABASE_PATH"])
+    if event is None:
+        return _json_error("Event not found.", 404)
+    # Enforce strict application isolation
+    if event["application_id"] != application["id"]:
+        return _json_error("Event not found.", 404)
+    return jsonify(
+        {
+            "event_id": event["id"],
+            "application": application["slug"],
+            "status": "accepted",
+            "action": event["action"],
+            "blocked": event["action"] in {"block", "block_and_alert"},
+            "risk_level": event["risk_level"],
+            "risk_score": event["risk_score"],
+            "rule_score": event["rule_score"],
+            "ml_probability": event["ml_probability"],
+            "ml_prediction": event["ml_prediction"],
+            "hybrid_signal": event["hybrid_signal"],
+            "detector_agreement": event["detector_agreement"],
+            "matched_rules": event.get("matched_rules", []),
+            "reasons": event.get("reasons", []),
+            "timestamp": event["timestamp"],
+        }
+    ), 200

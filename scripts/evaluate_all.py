@@ -132,7 +132,7 @@ def evaluate_ml(
     predicted = (probabilities >= ML_PROBABILITY_THRESHOLD).astype(int)
     result = calculate_metrics(actual, predicted)
     result["threshold"] = ML_PROBABILITY_THRESHOLD
-    result["threshold_meaning"] = "Probability at or above 0.5 is classified as XSS."
+    result["threshold_meaning"] = "Probability at or above 0.35 is classified as XSS."
     result["tfidf_features"] = int(features.shape[1])
     return result, predicted, probabilities, elapsed
 
@@ -151,7 +151,7 @@ def evaluate_hybrid(
     predicted = (signals >= HYBRID_SIGNAL_THRESHOLD).astype(int)
     result = calculate_metrics(actual, predicted)
     result["threshold"] = HYBRID_SIGNAL_THRESHOLD
-    result["threshold_meaning"] = "Hybrid signal at or above 0.5 is classified as XSS."
+    result["threshold_meaning"] = "Hybrid signal at or above 0.35 is classified as XSS."
     return result, predicted, signals, elapsed, results
 
 

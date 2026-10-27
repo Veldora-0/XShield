@@ -89,17 +89,19 @@
                                 <td><strong class="score-accent">98.56%</strong></td>
                                 <td><span class="num-zero">0</span></td>
                                 <td>3</td>
-                                <td class="mono-sub">~0.039 ms</td>
+                                <td>103</td>
+                                <td class="mono-sub">~0.023 ms</td>
                             </tr>
-                            <tr>
-                                <td><strong>Hybrid Detector (50/50 Fusion)</strong></td>
-                                <td>99.72%</td>
-                                <td>100.00%</td>
-                                <td>89.62%</td>
-                                <td>94.53%</td>
+                            <tr class="highlight-row">
+                                <td><strong>Hybrid Detector (Max-Signal Fusion)</strong></td>
+                                <td><strong class="score-accent">99.92%</strong></td>
+                                <td><strong class="score-accent">100.00%</strong></td>
+                                <td><strong class="score-accent">97.17%</strong></td>
+                                <td><strong class="score-accent">98.56%</strong></td>
                                 <td><span class="num-zero">0</span></td>
-                                <td>11</td>
-                                <td class="mono-sub">~1.657 ms</td>
+                                <td>3</td>
+                                <td>103</td>
+                                <td class="mono-sub">~1.181 ms</td>
                             </tr>
                         </tbody>
                     </table>
@@ -117,7 +119,7 @@
                 <div class="soc-card matrix-card">
                     <div class="matrix-card-header">
                         <h4>Final ML Detector (TF-IDF + LR)</h4>
-                        <span class="matrix-threshold">Threshold: Probability &ge; 0.50</span>
+                        <span class="matrix-threshold">Threshold: Probability &ge; 0.35</span>
                     </div>
                     <div class="matrix-table-wrap">
                         <table class="matrix-table">
@@ -178,8 +180,8 @@
                 <!-- 3. Hybrid Confusion Matrix -->
                 <div class="soc-card matrix-card">
                     <div class="matrix-card-header">
-                        <h4>Hybrid Detector (50/50 Fusion)</h4>
-                        <span class="matrix-threshold">Threshold: Hybrid Signal &ge; 0.50</span>
+                        <h4>Hybrid Detector (Max-Signal Fusion)</h4>
+                        <span class="matrix-threshold">Threshold: Hybrid Signal &ge; 0.35</span>
                     </div>
                     <div class="matrix-table-wrap">
                         <table class="matrix-table">
@@ -198,8 +200,8 @@
                                 </tr>
                                 <tr>
                                     <th>Actual XSS (1)</th>
-                                    <td class="cell-fn"><strong>11</strong><small>False Negative</small></td>
-                                    <td class="cell-tp"><strong>95</strong><small>True Positive</small></td>
+                                    <td class="cell-fn"><strong>3</strong><small>False Negative</small></td>
+                                    <td class="cell-tp"><strong>103</strong><small>True Positive</small></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -215,7 +217,7 @@
             <div class="soc-card hybrid-analysis-card">
                 <h3>Hybrid Detector Fusion Analysis</h3>
                 <p>
-                    The hybrid pipeline combines the heuristic score (50%) and the final ML probability (50%). On three payloads where the rule score was low (scores 20–40) despite triggering an alert, the combined linear signal fell just below the 0.50 decision threshold, resulting in 11 false negatives on this offline test set. This demonstrates the empirical trade-off of strict equal-weighted fusion without heuristic override logic.
+                    The hybrid engine evaluates both heuristic rule signatures and the TF-IDF machine learning model using Max-Signal Fusion at the 0.35 operational threshold. It achieves 99.92% accuracy and 97.17% recall on the frozen test set with zero false positives (3,861/3,861 benign correctly classified, 103/106 XSS attacks detected), ensuring that strong attack signals detected by either pipeline are decisively caught while eliminating false alarms.
                 </p>
             </div>
         </div>
