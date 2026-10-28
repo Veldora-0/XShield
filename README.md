@@ -30,7 +30,7 @@ XShield resolves these challenges through a **multi-tiered hybrid architecture**
 - **Dedicated SOC Security Console:** Unauthenticated local operations center featuring executive metrics, telemetry graphs, live event inspection, incident correlation views, and registered application tracking.
 - **Interactive Payload Scanner & Public Portal:** Interactive exploration workbench allowing security analysts to inspect arbitrary payloads with real-time rule breakdown and ML probability confidence scores.
 - **Independent Apex Enterprise Client Integration:** Demonstrates real-time external telemetry ingestion from a separate client web application via HTTP REST API.
-- **Full Test Coverage:** 157 automated tests covering all detection algorithms, API ingestion boundaries, database operations, behavioral analytics, and security hardening.
+- **Full Test Coverage:** 158 automated tests covering all detection algorithms, API ingestion boundaries, database operations, behavioral analytics, and security hardening.
 
 ---
 
@@ -379,7 +379,7 @@ XShield/
 │   ├── manage_applications.py        # Application & API key CLI
 │   ├── reset_demo_data.py            # Clean telemetry reset utility
 │   └── train_ml_model.py             # Reproducible model training
-├── tests/                            # Automated test suite (157 tests)
+├── tests/                            # Automated test suite (158 tests)
 │   ├── test_action_engine.py
 │   ├── test_application_management.py
 │   ├── test_dashboard.py
@@ -432,6 +432,13 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
+### 4. Generate ML Model Artifacts
+Generate the character-level TF-IDF vectorizer and Logistic Regression classifier from the committed dataset splits (`data/processed/xss_train_final.csv` and `data/processed/xss_test.csv`). This executes reproducibly with fixed random seeds in ~5 seconds:
+```powershell
+python scripts/train_ml_model.py
+```
+*(Creates `models/xss_tfidf_vectorizer.joblib` and `models/xss_logistic_regression.joblib` locally).*
+
 ---
 
 ## 18. Running XShield
@@ -439,7 +446,7 @@ pip install -r requirements.txt
 Start the XShield web application and Security Console:
 
 ```powershell
-cd D:\XShield
+cd XShield
 .\.venv\Scripts\python.exe -m app
 ```
 
@@ -481,7 +488,7 @@ To reset the demonstration telemetry ledger to a clean state while preserving re
 To launch the separate client application:
 
 ```powershell
-cd D:\ApexTestWebsite
+cd ../ApexTestWebsite
 python run.py
 ```
 
@@ -494,7 +501,7 @@ The client application will start on <http://127.0.0.1:3000> and communicate wit
 Run the complete automated test suite across all modules:
 
 ```powershell
-# Run all XShield unit and integration tests (157 expected)
+# Run all XShield unit and integration tests (158 expected)
 .\.venv\Scripts\python.exe -m unittest discover -s tests -v
 
 # Run reproducible evaluation across the frozen benchmark
