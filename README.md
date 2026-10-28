@@ -404,7 +404,10 @@ XShield/
 ## 16. Requirements
 
 - **Operating System:** Windows 10/11, Linux, or macOS.
-- **Python Runtime:** Python 3.10, 3.11, or 3.12 (Python 3.11+ recommended).
+- **Python Runtime:**
+  - **Minimum Supported:** Python 3.10+
+  - **Tested Runtimes:** Python 3.10, 3.11, 3.12, and 3.14 (tested locally on Python 3.14.7)
+  - **Recommended Runtime:** Python 3.11 or 3.12 (for optimal third-party package stability)
 - **Core Dependencies:**
   - `Flask` (Web framework and REST routing)
   - `scikit-learn` (TF-IDF vectorizer and Logistic Regression)
@@ -446,9 +449,12 @@ python scripts/train_ml_model.py
 Start the XShield web application and Security Console:
 
 ```powershell
-cd XShield
-.\.venv\Scripts\python.exe -m app
+# From the repository root directory (where Steps 1-4 were completed):
+python -m app
 ```
+*(Or invoke via the virtual environment interpreter: `.\.venv\Scripts\python.exe -m app`).*
+
+> **Sequential Navigation Note:** If you followed Section 17, you are already inside the `XShield` root directory. Do not run `cd XShield` again. If you open a new terminal session later, navigate first to your local XShield folder (e.g., `cd D:\XShield` or your local clone path) and activate the virtual environment (`.\.venv\Scripts\Activate.ps1`) before running `python -m app`.
 
 Once started, the following interfaces will be available:
 - **Public Product Portal:** <http://127.0.0.1:5000/>
@@ -485,10 +491,15 @@ To reset the demonstration telemetry ledger to a clean state while preserving re
 
 ## 19. Running ApexTestWebsite (External Integration)
 
-To launch the separate client application:
+`ApexTestWebsite` is a completely independent client application that connects to XShield exclusively through HTTP REST API calls.
+
+To launch the client application alongside XShield:
 
 ```powershell
-cd ../ApexTestWebsite
+# Open a separate (second) terminal window and navigate to your ApexTestWebsite directory:
+cd D:\ApexTestWebsite    # Adjust if cloned to another path
+
+# Ensure its virtual environment is active and launch the portal on port 3000:
 python run.py
 ```
 
