@@ -2552,25 +2552,59 @@ code, pre {
 .metric-icon-wrap {
     color: var(--text-muted);
     opacity: 0.7;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
 }
 
 .metric-body {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
 }
 
 .metric-number {
     font-size: 1.9rem;
     font-weight: 800;
-    line-height: 1;
+    line-height: 1.1;
     color: var(--text-primary);
     font-family: var(--font-mono);
     margin-bottom: 6px;
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    display: inline-block;
+    width: auto;
+    max-width: 100%;
+}
+
+.metric-number.risk-high {
+    color: var(--risk-high) !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+
+.metric-number.risk-critical {
+    color: var(--risk-critical) !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
 }
 
 .metric-context {
     font-size: 0.7rem;
     color: var(--text-muted);
+    line-height: 1.3;
 }
 
 .metric-accent-bar {
@@ -2586,9 +2620,6 @@ code, pre {
 .bar-critical { background-color: var(--risk-critical); }
 .bar-blocked { background-color: var(--risk-medium); }
 .bar-apps { background-color: var(--cyan); }
-
-.risk-high { color: var(--risk-high) !important; }
-.risk-critical { color: var(--risk-critical) !important; }
 
 /* Threat Spectrum Distribution Panel */
 .risk-spectrum-panel {
@@ -2941,28 +2972,50 @@ code, pre {
     border: 1px solid transparent;
 }
 
-.risk-low {
+/* Badge-specific severity colors with background and border */
+.badge.risk-low,
+.risk-badge.risk-low {
     color: var(--risk-low);
     background-color: var(--risk-low-bg);
     border-color: var(--risk-low-border);
 }
 
-.risk-medium {
+.badge.risk-medium,
+.risk-badge.risk-medium {
     color: var(--risk-medium);
     background-color: var(--risk-medium-bg);
     border-color: var(--risk-medium-border);
 }
 
-.risk-high {
+.badge.risk-high,
+.risk-badge.risk-high {
     color: var(--risk-high);
     background-color: var(--risk-high-bg);
     border-color: var(--risk-high-border);
 }
 
-.risk-critical {
+.badge.risk-critical,
+.risk-badge.risk-critical {
     color: var(--risk-critical);
     background-color: var(--risk-critical-bg);
     border-color: var(--risk-critical-border);
+}
+
+/* General standalone risk text color utilities (no background / no border) */
+.risk-low {
+    color: var(--risk-low);
+}
+
+.risk-medium {
+    color: var(--risk-medium);
+}
+
+.risk-high {
+    color: var(--risk-high);
+}
+
+.risk-critical {
+    color: var(--risk-critical);
 }
 
 .action-badge {
